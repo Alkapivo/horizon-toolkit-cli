@@ -1,0 +1,33 @@
+{
+	"compilerOptions": {
+		"target": "es2017",
+		"module": "commonjs",
+		"rootDir": "src",
+		"outDir": "lib",
+		"sourceMap": true,
+		"resolveJsonModule": true,
+		"lib": [
+			"es6",
+			"es2019",
+			"dom"
+		],
+		"esModuleInterop": true,
+		"types": [
+			"reflect-metadata",
+			"node",
+			"chai",
+			"express",
+			"mocha",
+			"typescript",
+		],
+		"moduleResolution": "node",
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
+	},
+	"include": [
+		"src/**/*.ts"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}

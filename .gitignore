@@ -1,0 +1,29 @@
+# dependencies
+/node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Target directories
+/.nyc_output
+/coverage
+/lib
+
+# IDE - VSCode
+.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# System Files
+.DS_Store
+Thumbs.db
