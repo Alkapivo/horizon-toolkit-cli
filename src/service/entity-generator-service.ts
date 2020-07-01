@@ -2,47 +2,59 @@ import { injectable } from "inversify";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { ModelEntity, CodeSnippet, Entity, FieldTypes, CollectionTypes } from "../type/entity-builder-model";
 
+export interface InitializeEntitiesScript {
+	className: string,
+	prototype: number,
+}
+
 @injectable()
 export class EntityGeneratorService {
     
     public readonly name: string = "EntityGeneratorService";
 
-	public buildEntities(classes: string[], yypPath: string, modelPath: string): void {
+	public buildEntities(classes: string[], yypPath: string, modelPath: string, projectName: string): void {
 		if (existsSync(modelPath)) {
 			const model: ModelEntity[] = JSON.parse(readFileSync(modelPath).toString());
-			const entities = model
-				.filter(entity => {
-					if (classes.length > 0) {
-						const includes = classes.includes(entity.name)
-						if (!includes) {
-							throw new Error(`Entity ${entity.name} wasn't found`);
-						}
-						return includes;
-					} else {
-						return true;
-					}
-				})
-				.map(entity => {
-					return {
-						name: entity.name,
-						schema: JSON.stringify(entity.schema),
-						enums: JSON.stringify(entity.enums),
-						primitives: JSON.stringify(entity.primitives)
-					}
-				});
-			entities.forEach(entity => {
-				const codeSnippets = this.generateEntityCode(entity);
-				console.info("Save", entity.name);
-				codeSnippets.forEach(snippet => {
-					this.codeSnippetsWriter(snippet, yypPath);
-				});
-			});
+
+			this.codeSnippetParser(model, classes, yypPath, projectName);
+			this.entityDefinitionWriter(yypPath, projectName, model);
+
 		} else {
-			throw new Error("model.json file wasn't found");
+			throw new Error("model.json file wasn't found. modelPath: " + modelPath);
 		}
 	}
 
-	public codeSnippetsWriter(codeSnippet: CodeSnippet, yypPath: string): void {
+	private codeSnippetParser(model: ModelEntity[], classes: string[], yypPath: string, projectName: string) {
+		const entities = model
+			.filter(entity => {
+				if (classes.length > 0) {
+					const includes = classes.includes(entity.name)
+					if (!includes) {
+						throw new Error(`Entity ${entity.name} wasn't found`);
+					}
+					return includes;
+				} else {
+					return true;
+				}
+			})
+			.map(entity => {
+				return {
+					name: entity.name,
+					schema: JSON.stringify(entity.schema),
+					enums: JSON.stringify(entity.enums),
+					primitives: JSON.stringify(entity.primitives)
+				}
+			});
+		entities.forEach(entity => {
+			const codeSnippets = this.generateEntityCode(entity);
+			console.info("Save", entity.name);
+			codeSnippets.forEach(snippet => {
+				this.codeSnippetsWriter(snippet, yypPath, projectName);
+			});
+		});
+	}
+
+	private codeSnippetsWriter(codeSnippet: CodeSnippet, yypPath: string, projectName: string): void {
 		const projectPath = `${yypPath}/scripts`;
 		const regex = /(?<=\/\/\/@function)(.*)(?=\()/
 		const gmlSnippets = codeSnippet.snippets.map(snippet => {
@@ -63,21 +75,75 @@ export class EntityGeneratorService {
 				const assetScriptPathYY = `${projectPath}/${gmlSnippet.scriptName}/${gmlSnippet.scriptName}.yy`;
 				if (existsSync(assetScriptPathYY)) {
 					try {
-						if (readFileSync(assetScriptPathGML).toString().includes("///@override")) {
+						if (existsSync(assetScriptPathGML) && (readFileSync(assetScriptPathGML).toString().includes("///@override"))) {
 							console.warn("File", gmlSnippet.scriptName + ".gml", "couldn't be saved - @override exists");
+						} else {
+							writeFileSync(assetScriptPathGML, gmlSnippet.gml);
+							//console.info("> Saved file", gmlSnippet.scriptName + ".gml");
 						}
 					} catch (ex) {
-						console.debug("readFile", ex);
+						console.error("ReadFileException", ex);
 					}
-					writeFileSync(assetScriptPathGML, gmlSnippet.gml);
-					console.debug("> Saved file", gmlSnippet.scriptName + ".gml");
 				} else {
-					throw new Error(`File ${assetScriptPathGML} wasn't found`);
+					throw new Error(`File ${assetScriptPathYY} wasn't found`);
 				}
 			} else {
 				throw new Error(`AssetScript ${gmlSnippet.scriptName} wasn't found in yyp`);
 			}
 		});
+	}
+
+	private entityDefinitionWriter(yypPath: string, projectName: string, model: ModelEntity[]) {
+		const initializeEntitiesScript = `initialize${this.initialToUpper(projectName)}Entities`;
+			const initializeEntiteisPathGML = `${yypPath}/scripts/${initializeEntitiesScript}/${initializeEntitiesScript}.gml`;
+			const entitiesDefinition = readFileSync(initializeEntiteisPathGML).toString();
+			const entityPrototypeRegex = /(?<=global.entityPrototypes\[\?)(.*?)(?=;)/g;
+			let parsedEntities: InitializeEntitiesScript[] = [
+				...entitiesDefinition
+					.match(entityPrototypeRegex)
+					.map(match => {
+						const tuple = match.split("]");
+						if (tuple.length >= 2) {
+							const className = tuple[0].trim();
+							const prototype: number = Number(tuple[1].replace("=", "").trim());
+							return {
+								className: className,
+								prototype: prototype,
+							}
+						}
+						return undefined;
+					})
+					.filter(entity => entity),
+			];
+
+			parsedEntities = [
+				...parsedEntities,
+				...model
+					.filter(entry => parsedEntities.filter(entity => entity.className === entry.name).length === 0)
+					.map(entry => {
+						return {
+							className: entry.name,
+							prototype: Object.keys(entry.schema).length,
+						}
+					}),
+			];
+			
+
+			const beginId = 200200;
+			const newEntityDefinition = `///@function initialize${this.initialToUpper(projectName)}Entities()\r\n` +
+				`\r\n` +
+				parsedEntities.map((entity, index) => {
+					const modelEntry = model.filter(entry => entry.name === entity.className);
+					const prototype = modelEntry ? Object.keys(modelEntry[0].schema).length : entity.prototype;
+					return `` + 
+						`\t#macro ${entity.className} ${beginId + (index + 1)}\r\n` +
+						`\tglobal.entityPrototypes[? ${entity.className}] = ${prototype};\r\n` +
+						`\tglobal.entityClassNames[? ${entity.className}] = "${entity.className}";\r\n` +
+						`\t\r\n`;
+				}).join("\n")
+
+			writeFileSync(initializeEntiteisPathGML, newEntityDefinition);
+			console.log(`Save initialize${this.initialToUpper(projectName)}Entities`)
 	}
 
 	public generateEntityCode(state: Entity): CodeSnippet[] {

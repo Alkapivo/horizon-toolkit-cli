@@ -120,8 +120,8 @@ export interface TiledTilesetObject {
 
 /* TiledMap */
 export enum TiledTilesetCompressMethod {
-    NONE = "none",
-    PER_ROW = "perRow",
+    NONE = 0,
+    PER_ROW = 1,
 }
 
 export interface TiledMap {
@@ -131,7 +131,7 @@ export interface TiledMap {
     layers: TiledLayer[],
     tileWidth: number,
     tileHeight: number,
-    compressMethod?: string,
+    compressMethod?: TiledTilesetCompressMethod,
 }
 
 export interface TiledLayer {
@@ -139,28 +139,21 @@ export interface TiledLayer {
     name: string,
     opacity: number,
     type: string,
-    x: number,
-    y: number,
+    xPos: number,
+    yPos: number,
     properties?: Map<string, string>,
     data?: string,
-    compressMethod?: TiledTilesetCompressMethod,
     height?: number,
     width?: number,
-    draworder?: string,
     objects?: TiledObject[],
     layers?: TiledLayer[],
-}
-
-export interface TiledTileset {
-    name: string,
-    data: string[][],
 }
 
 export interface TiledObject {
     type: string,
     name: string,
-    x: number,
-    y: number,
+    xPos: number,
+    yPos: number,
     xScale: number,
     yScale: number,
     properties?: Map<string, string>,

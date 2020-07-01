@@ -16,10 +16,11 @@ export class TiledConverterService {
 
         const tilesetOffsetDictionary: Map<string, number> = this.getTilesetOffsetDictionaryFromJsonTiledMap(jsonTiledMap);
         const objectDictionary: Map<number, TiledTilesetObject> = this.getObjectDictionaryFromJsonTiledMap(jsonTiledMap);
+        const compressMethod = TiledTilesetCompressMethod.PER_ROW;
 
         const tiledLayers: TiledLayer[] = jsonTiledMap.layers
             .map(layer => this.convertJsonTiledLayerToTiledLayers(
-                layer, tilesetOffsetDictionary, objectDictionary))
+                layer, tilesetOffsetDictionary, objectDictionary, compressMethod))
             .filter(layer => layer)
             .flat();
 
@@ -30,7 +31,7 @@ export class TiledConverterService {
             layers: tiledLayers,
             tileWidth: jsonTiledMap.tilewidth,
             tileHeight: jsonTiledMap.tileheight,
-            compressMethod: TiledTilesetCompressMethod.PER_ROW
+            compressMethod: compressMethod,
         }
 
         return tiledMap;
@@ -42,7 +43,8 @@ export class TiledConverterService {
     private convertJsonTiledLayerToTiledLayers(
         jsonTiledLayer: JsonTiledLayer, 
         tilesetOffsetDictionary: Map<string, number>, 
-        objectDictionary: Map<number, TiledTilesetObject>): TiledLayer[] {
+        objectDictionary: Map<number, TiledTilesetObject>,
+        compressMethod: TiledTilesetCompressMethod): TiledLayer[] {
             
         const layerType = this.getJsonTiledLayerType(jsonTiledLayer);
         switch (layerType) {
@@ -52,18 +54,18 @@ export class TiledConverterService {
                     name: jsonTiledLayer.name,
                     opacity: jsonTiledLayer.opacity,
                     type: JsonTiledLayerType.GROUP,
-                    x: jsonTiledLayer.x,
-                    y: jsonTiledLayer.y,
+                    xPos: jsonTiledLayer.x,
+                    yPos: jsonTiledLayer.y,
                     layers: jsonTiledLayer.layers
                         .map(layer => this.convertJsonTiledLayerToTiledLayers(
-                            layer, tilesetOffsetDictionary, objectDictionary))
+                            layer, tilesetOffsetDictionary, objectDictionary, compressMethod))
                         .flat()
                 }
                 return [tiledLayer];
             case JsonTiledLayerType.OBJECTS:
                 return [this.convertJsonTiledLayerToTiledLayerObject(jsonTiledLayer)];
             case JsonTiledLayerType.TILESET:
-                return [this.convertJsonTiledLayerToTiledLayerTileset(jsonTiledLayer, tilesetOffsetDictionary)];
+                return [this.convertJsonTiledLayerToTiledLayerTileset(jsonTiledLayer, tilesetOffsetDictionary, compressMethod)];
             default:
                 throw new UndefinedJsonTiledLayerTypeException(`Found unrecognized layerType "${layerType}". Maybe you forget to implement parser for this type?`);
         }
@@ -90,9 +92,8 @@ export class TiledConverterService {
             name: jsonTiledLayer.name,
             opacity: jsonTiledLayer.opacity,
             type: JsonTiledLayerType.OBJECTS,
-            x: jsonTiledLayer.x,
-            y: jsonTiledLayer.y,
-            draworder: jsonTiledLayer.draworder,
+            xPos: jsonTiledLayer.x,
+            yPos: jsonTiledLayer.y,
             objects: jsonTiledLayer.objects.map((object: JsonTiledObject) => this.convertJsonTiledObjectToTiledObject(object)),
         };
 
@@ -108,8 +109,8 @@ export class TiledConverterService {
         const parsedObject: TiledObject = {
             type: object.type,
             name: object.name,
-            x: object.x,
-            y: object.y,
+            xPos: object.x,
+            yPos: object.y,
             xScale: object.width,
             yScale: object.height,
         }
@@ -126,16 +127,15 @@ export class TiledConverterService {
      * @throws {JsonTiledPropertyNotFoundException}
      */
     private convertJsonTiledLayerToTiledLayerTileset(jsonTiledLayer: JsonTiledLayer, 
-        tilesetOffsetDictionary: Map<string, number>): TiledLayer {
+        tilesetOffsetDictionary: Map<string, number>, compressMethod: TiledTilesetCompressMethod): TiledLayer {
 
         const tiledLayer: TiledLayer = {
             id: jsonTiledLayer.id,
             name: jsonTiledLayer.name,
             opacity: jsonTiledLayer.opacity,
             type: JsonTiledLayerType.TILESET,
-            x: jsonTiledLayer.x,
-            y: jsonTiledLayer.y,
-            compressMethod: TiledTilesetCompressMethod.PER_ROW,
+            xPos: jsonTiledLayer.x,
+            yPos: jsonTiledLayer.y,
             height: jsonTiledLayer.width,
             width: jsonTiledLayer.height,
             properties: new Map<string, string>(),
@@ -174,7 +174,7 @@ export class TiledConverterService {
             tiledLayer.width, tiledLayer.height, 
             this.removeJsonTiledTilesDataOffset(jsonTiledLayer.data, tilesOffset));
 
-        switch (tiledLayer.compressMethod) {
+        switch (compressMethod) {
             case TiledTilesetCompressMethod.PER_ROW:
                 tiledLayer.data = this.compressTilesDataPerRow(tilesData);
                 break;
