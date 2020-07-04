@@ -214,6 +214,7 @@ export class EntityGeneratorService {
 
 			const entityLabel = `"${parameterName}"`;
 			const fieldGetter = `get${entityClassName}${this.initialToUpper(parameterName)}(${entityObjectName})`;
+			const escapedParameterType = this.getEscapedParameterType(parameterType);
 
 			if (fieldType.toLowerCase().includes("primitive")) {
 
@@ -373,14 +374,14 @@ export class EntityGeneratorService {
 								`\t\t\tjsonObject,\n` + 
 								`\t\t\t${entityLabel},\n` + 
 								`\t\t\t${fieldGetter},\n` +
-								`\t\t\t"${parameterType}");\n` +
+								`\t\t\t"${escapedParameterType}");\n` +
 								`\t}\n\t\n`
 						} else {
 							functionBody += `\tappendEntityToJsonObject(\n` + 
 							`\t\tjsonObject,\n` + 
 							`\t\t${entityLabel},\n` + 
 							`\t\t${fieldGetter},\n` +
-							`\t\t"${parameterType}");\n` +
+							`\t\t"${escapedParameterType}");\n` +
 							`\t\n`
 						}
 						break;
@@ -391,7 +392,7 @@ export class EntityGeneratorService {
 								`\t\t\tjsonObject,\n` + 
 								`\t\t\t${entityLabel},\n` + 
 								`\t\t\t${fieldGetter},\n` +
-								`\t\t\t"${parameterType}",\n` +
+								`\t\t\t"${escapedParameterType}",\n` +
 								`\t\t\tArray);\n` +
 								`\t}\n\t\n`
 						} else {
@@ -399,7 +400,7 @@ export class EntityGeneratorService {
 							`\t\tjsonObject,\n` + 
 							`\t\t${entityLabel},\n` + 
 							`\t\t${fieldGetter},\n` +
-							`\t\t"${parameterType}",\n` +
+							`\t\t"${escapedParameterType}",\n` +
 							`\t\tArray);\n` +
 							`\t\n`
 						}
@@ -411,7 +412,7 @@ export class EntityGeneratorService {
 								`\t\t\tjsonObject,\n` + 
 								`\t\t\t${entityLabel},\n` + 
 								`\t\t\t${fieldGetter},\n` +
-								`\t\t\t"${parameterType}",\n` +
+								`\t\t\t"${escapedParameterType}",\n` +
 								`\t\t\tList);\n` +
 								`\t}\n\t\n`
 						} else {
@@ -419,7 +420,7 @@ export class EntityGeneratorService {
 							`\t\tjsonObject,\n` + 
 							`\t\t${entityLabel},\n` + 
 							`\t\t${fieldGetter},\n` +
-							`\t\t"${parameterType}",\n` +
+							`\t\t"${escapedParameterType}",\n` +
 							`\t\tList);\n` +
 							`\t\n`
 						}
@@ -431,7 +432,7 @@ export class EntityGeneratorService {
 								`\t\t\tjsonObject,\n` + 
 								`\t\t\t${entityLabel},\n` + 
 								`\t\t\t${fieldGetter},\n` +
-								`\t\t\t"${parameterType}",\n` +
+								`\t\t\t"${escapedParameterType}",\n` +
 								`\t\t\tMap);\n` +
 								`\t}\n\t\n`
 						} else {
@@ -439,7 +440,7 @@ export class EntityGeneratorService {
 							`\t\tjsonObject,\n` + 
 							`\t\t${entityLabel},\n` + 
 							`\t\t${fieldGetter},\n` +
-							`\t\t"${parameterType}",\n` +
+							`\t\t"${escapedParameterType}",\n` +
 							`\t\tMap);\n` +
 							`\t\n`
 						}
@@ -451,7 +452,7 @@ export class EntityGeneratorService {
 								`\t\t\tjsonObject,\n` + 
 								`\t\t\t${entityLabel},\n` + 
 								`\t\t\t${fieldGetter},\n` +
-								`\t\t\t"${parameterType}",\n` +
+								`\t\t\t"${escapedParameterType}",\n` +
 								`\t\t\tStack);\n` +
 								`\t}\n\t\n`
 						} else {
@@ -459,7 +460,7 @@ export class EntityGeneratorService {
 							`\t\tjsonObject,\n` + 
 							`\t\t${entityLabel},\n` + 
 							`\t\t${fieldGetter},\n` +
-							`\t\t"${parameterType}",\n` +
+							`\t\t"${escapedParameterType}",\n` +
 							`\t\tStack);\n` +
 							`\t\n`
 						}
@@ -472,7 +473,7 @@ export class EntityGeneratorService {
 								`\t\t\tjsonObject,\n` + 
 								`\t\t\t${entityLabel},\n` + 
 								`\t\t\t${fieldGetter},\n` +
-								`\t\t\t"${parameterType}",\n` +
+								`\t\t\t"${escapedParameterType}",\n` +
 								`\t\t\tGrid);\n` +
 								`\t}\n\t\n`
 						} else {
@@ -480,7 +481,7 @@ export class EntityGeneratorService {
 							`\t\tjsonObject,\n` + 
 							`\t\t${entityLabel},\n` + 
 							`\t\t${fieldGetter},\n` +
-							`\t\t"${parameterType}",\n` +
+							`\t\t"${escapedParameterType}",\n` +
 							`\t\tGrid);\n` +
 							`\t\n`
 						}
@@ -492,7 +493,7 @@ export class EntityGeneratorService {
 								`\t\t\tjsonObject,\n` + 
 								`\t\t\t${entityLabel},\n` + 
 								`\t\t\t${fieldGetter},\n` +
-								`\t\t\t"${parameterType}",\n` +
+								`\t\t\t"${escapedParameterType}",\n` +
 								`\t\t\tQueue);\n` +
 								`\t}\n\t\n`
 						} else {
@@ -500,7 +501,7 @@ export class EntityGeneratorService {
 							`\t\tjsonObject,\n` + 
 							`\t\t${entityLabel},\n` + 
 							`\t\t${fieldGetter},\n` +
-							`\t\t"${parameterType}",\n` +
+							`\t\t"${escapedParameterType}",\n` +
 							`\t\tQueue);\n` +
 							`\t\n`
 						}
@@ -512,7 +513,7 @@ export class EntityGeneratorService {
 								`\t\t\tjsonObject,\n` + 
 								`\t\t\t${entityLabel},\n` + 
 								`\t\t\t${fieldGetter},\n` +
-								`\t\t\t"${parameterType}",\n` +
+								`\t\t\t"${escapedParameterType}",\n` +
 								`\t\t\tPriorityQueue);\n` +
 								`\t}\n\t\n`
 						} else {
@@ -520,7 +521,7 @@ export class EntityGeneratorService {
 							`\t\tjsonObject,\n` + 
 							`\t\t${entityLabel},\n` + 
 							`\t\t${fieldGetter},\n` +
-							`\t\t"${parameterType}",\n` +
+							`\t\t"${escapedParameterType}",\n` +
 							`\t\tPriorityQueue);\n` +
 							`\t\n`
 						}
@@ -560,125 +561,142 @@ export class EntityGeneratorService {
 			if (fieldType.toLowerCase().includes("primitive")) {
 				switch (fieldType) {
 					case FieldTypes.PRIMITIVE:
-						functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel});\n`
-						if (!isParameterOptional) {
-							functionBody += `\tif (!isOptionalPresent(${parameterName})) {\n` +
-							`\t\tlogger("[${functionName}] Field \\\"${parameterName}\\\" is null". LogType.WARNING)\n` +
-							`\t}\n\t\n`;
+						if (isParameterOptional) {
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel});\n`
+						} else {
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}));\n`
 						}
 						break;
 					case FieldTypes.PRIMITIVE_ARRAY:
-						functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel});\n`
-						if (!isParameterOptional) {
-							functionBody += `\tif (!isOptionalPresent(${parameterName})) {\n` +
-								`\t\tlogger("[${functionName}] Field \\\"${parameterName}\\\" is null". LogType.WARNING)\n` +
-								`\t}\n`;
-						}
 						if (isParameterOptional) {
-							functionBody += `\tif (isOptionalPresent(${parameterName})) {\n` +
-								`\t\tif (isJsonArray(${parameterName}))) {\n` +
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel});` +
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
+								`\t\tif (isJsonArray(${parameterName})) {\n` +
 								`\t\t\t${parameterName} = cloneArray(getJsonArrayData(${parameterName}));\n` +
 								`\t\t} else {\n` +
-								`\t\t\tlogger("[${functionName}] Field \\\"${parameterName}\\\" isn't an JsonArray", LogType.WARNING);\n` +
+								`\t\t\t${parameterName} = [];\n` +
+								`\t\t\tvar exceptionMessage = "[${functionName}] Field \"${parameterName}\" isn't an JsonArray";\n` +
+								`\t\t\tthrowException(createException(RuntimeException, exceptionMessage, null));\n` +
 								`\t\t}\n` +
-								`\t}\n\t\n`;
+								`\t}\n` +
+								`\t\n`;
 						} else {
-							functionBody += `\tif (isJsonArray(${parameterName})) {\n` +
-								`\t\t${parameterName} = cloneArray(getJsonArrayData(${parameterName}));\n` +
-								`\t} else {\n` +
-								`\t\tlogger("[${functionName}] Field \\\"${parameterName}\\\" isn't an JsonArray", LogType.WARNING);\n` +
-								`\t}\n\t\n`;
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel});` +
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
+								`\t\tif (isJsonArray(${parameterName})) {\n` +
+								`\t\t\t${parameterName} = cloneArray(getJsonArrayData(${parameterName}));\n` +
+								`\t\t} else {\n` +
+								`\t\t\t${parameterName} = [];\n` +
+								`\t\t\tvar exceptionMessage = "[${functionName}] Field \"${parameterName}\" isn't an JsonArray";\n` +
+								`\t\t\tthrowException(createException(RuntimeException, exceptionMessage, null));\n` +
+								`\t\t}\n` +
+								`\t}\n` +
+								`\t${parameterName} = assertNoOptional(${parameterName});\n` + 
+								`\t\n`;
 						}
-
 						break;
 					case FieldTypes.PRIMITIVE_LIST:
-						functionBody += `\tvar ${parameterName} = getTJsonList(tjsonObject, ${entityLabel});\n`
+						if (isParameterOptional) {
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, List);\n`;
+						} else {
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, List));\n`;
+						}
 						break;
 					case FieldTypes.PRIMITIVE_MAP:
-						functionBody += `\tvar ${parameterName} = getTJsonMap(tjsonObject, ${entityLabel});\n`
+						if (isParameterOptional) {
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Map);\n`;
+						} else {
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Map));\n`;
+						}
 						break;
 					case FieldTypes.PRIMITIVE_STACK:
-						functionBody += `\tvar ${parameterName} = getTJsonArray(tjsonObject, ${entityLabel});\n`;
+						if (isParameterOptional) {
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Stack);\n`;
+						} else {
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Stack));\n`;
+						}
 						break;
 					case FieldTypes.PRIMITIVE_GRID:
-						functionBody += `\tvar ${parameterName} = getTJsonArray(tjsonObject, ${entityLabel});\n`;
+						if (isParameterOptional) {
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Grid);\n`;
+						} else {
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Grid));\n`;
+						}
 						break;
 					case FieldTypes.PRIMITIVE_QUEUE:
-						functionBody += `\tvar ${parameterName} = getTJsonArray(tjsonObject, ${entityLabel});\n`;
+						if (isParameterOptional) {
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Queue);\n`;
+						} else {
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Queue));\n`;
+						}
 						break;
 					case FieldTypes.PRIMITIVE_PRIORITY_QUEUE:
-						functionBody += `\tvar ${parameterName} = getTJsonMap(tjsonObject, ${entityLabel});\n`;
+						if (isParameterOptional) {
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, PriorityQueue);\n`;
+						} else {
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, PriorityQueue));\n`;
+						}
 						break;
 				}
 			}
 
 			if (fieldType.toLowerCase().includes("entity")) {
-				let entityClass = "";
-				let entityType = parameterType.includes("Optional<") ?
-					parameterType.replace("Optional<", "").slice(0, -1) :
-					parameterType;
+				const escapedParameterType = this.getEscapedParameterType(parameterType);
 				switch (fieldType) {
 					case FieldTypes.ENTITY:
 						if (isParameterOptional) {
-							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Entity, "${parameterType}"));\n`
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Entity, "${escapedParameterType}");\n`;
 						} else {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Entity, "${parameterType}");\n`
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Entity, "${escapedParameterType}"));\n`;
 						}
 						break;
 					case FieldTypes.ENTITY_ARRAY:
-						entityClass = entityType.replace("[]", "");
 						if (isParameterOptional) {
-							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Array, ${parameterType}));\n`
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Array, "${escapedParameterType}");\n`
 						} else {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Array, ${parameterType});\n`
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Array, "${escapedParameterType}"));\n`;
 						}
 						break;
 					case FieldTypes.ENTITY_LIST:
-						entityClass = entityType.replace("List<", "").replace(">", "");
 						if (isParameterOptional) {
-							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, List, ${parameterType}));\n`
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, List, "${escapedParameterType}");\n`
 						} else {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, List, ${parameterType});\n`
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, List, "${escapedParameterType}"));\n`;
 						}
 						break;
 					case FieldTypes.ENTITY_MAP: 
-						entityClass = entityType.replace("Map<", "").replace(">", "").split("::")[1].replace(" ", "");
 						if (isParameterOptional) {
-							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Map, ${parameterType}));\n`
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Map, "${escapedParameterType}");\n`;
 						} else {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Map, ${parameterType});\n`
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Map, "${escapedParameterType}"));\n`;
 						}
 						break;
 					case FieldTypes.ENTITY_STACK:
-						entityClass = entityType.replace("Stack<", "").replace(">", "");
 						if (isParameterOptional) {
-							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Stack, ${parameterType}));\n`
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Stack, "${escapedParameterType}");\n`;
 						} else {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Stack, ${parameterType});\n`
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Stack, "${escapedParameterType}"));\n`;
 						}
 						break;
 					case FieldTypes.ENTITY_GRID:
-						entityClass = entityType.replace("Grid<", "").replace(">", "");
 						if (isParameterOptional) {
-							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Grid, ${parameterType}));\n`
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Grid, "${escapedParameterType}");\n`;
 						} else {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Grid, ${parameterType});\n`
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Grid, "${escapedParameterType}"));\n`;
 						}
 						break;
 					case FieldTypes.ENTITY_QUEUE:
-						entityClass = entityType.replace("Queue<", "").replace(">", "");
 						if (isParameterOptional) {
-							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Queue, ${parameterType}));\n`
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Queue, "${escapedParameterType}");\n`;
 						} else {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Queue, ${parameterType});\n`
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Queue, "${escapedParameterType}"));\n`;
 						}
 						break;
 					case FieldTypes.ENTITY_PRIORITY_QUEUE:
-						entityClass = entityType.replace("PriorityQueue<", "").replace(">", "");
 						if (isParameterOptional) {
-							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, PriorityQueue, ${parameterType}));\n`
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, PriorityQueue, "${escapedParameterType}");\n`;
 						} else {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, PriorityQueue, ${parameterType});\n`
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, PriorityQueue, "${escapedParameterType}"));\n`;
 						}
 						break;
 				}
@@ -1095,5 +1113,20 @@ export class EntityGeneratorService {
 		return isParameterPrimitiveOrEnum(parameterType) ? 
 			FieldTypes.PRIMITIVE :
 			FieldTypes.ENTITY;
+	}
+
+	private getEscapedParameterType(parameterType: string): string {
+		let escapedParameterType = parameterType
+			.replace("Optional<", "").replace(">", "")
+			.replace("[]", "")
+			.replace("List<", "").replace(">", "")
+			.replace("Stack<", "").replace(">", "")
+			.replace("Grid<", "").replace(">", "")
+			.replace("Queue<", "").replace(">", "")
+			.replace("PriorityQueue<", "").replace(">", "");
+			
+		return escapedParameterType.includes("Map<") ?
+			escapedParameterType.replace("Map<", "").replace(">", "").split("::")[1].replace(" ", "") :
+			escapedParameterType;
 	}
 }

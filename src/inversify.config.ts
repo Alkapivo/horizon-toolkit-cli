@@ -1,5 +1,6 @@
 import "reflect-metadata";
-import { Container } from "inversify";
+import log4js from 'log4js';
+import { Container, injectable } from "inversify";
 import { TiledConverterService } from "./service/tiled-converter-service";
 import { EntityGeneratorService } from "./service/entity-generator-service";
 

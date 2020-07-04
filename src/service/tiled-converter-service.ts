@@ -1,4 +1,5 @@
 import { injectable } from 'inversify';
+import { Base64 } from 'js-base64';
 import { TiledMap, JsonTiledMap, TiledTilesetObject, TiledLayer, TiledTilesetCompressMethod, JsonTiledLayer, JsonTiledLayerType, UndefinedJsonTiledLayerTypeException, JsonTiledObject, JsonTiledLayerProperty, TiledObject, JsonTiledPropertyNotFoundException, JsonTiledTilesOffsetNotFoundException } from '../type/tiled-converter-model';
 
 
@@ -161,9 +162,6 @@ export class TiledConverterService {
         const tilesetName: string = tiledLayer.properties.get("tilesetName");
         const tilesOffset: number = tilesetOffsetDictionary.get(tilesetName);
 
-        console.log(tilesOffset);
-        console.log(tilesetOffsetDictionary);
-
         if (!tilesOffset) {
             throw new JsonTiledTilesOffsetNotFoundException(
                 `offset for tilesetName "${tilesetName}" in layer "${tiledLayer.name}" wasn't found`
@@ -214,7 +212,11 @@ export class TiledConverterService {
     }
 
     private convertJsonTiledLayerTileDataTo2DArray(width: number, height: number, tiles: number[]): number[][] {
-        return Array(height).map((row, yTile) => Array(width).map((column, xTile) => tiles[(yTile * width) + xTile]));
+        let tmp = [];
+        for (let index = 0; index < tiles.length; index += width) {
+            tmp.push(tiles.slice(index, index + width));
+        }
+        return tmp;
     }
 
     private removeJsonTiledTilesDataOffset(tileData: number[], offset: number): number[] {
@@ -228,7 +230,7 @@ export class TiledConverterService {
             let zeroCounter = 0;
             for (let rowIndex = 0; rowIndex < row.length; rowIndex++) {
                 if (row[rowIndex] !== 0) {
-                    isZeroRow = true;
+                    isZeroRow = false;
                     if (zeroCounter !== 0) {
                         compressedRow.push(-1 * zeroCounter)
                     }
@@ -240,11 +242,10 @@ export class TiledConverterService {
                         compressedRow.push(-zeroCounter);
                     }
                 }
-                return isZeroRow ? NaN : compressedRow
             }
-            return null;
+            return isZeroRow ? [] : compressedRow
         });
-
-        return JSON.stringify(compressedTilesData);
+        const rawString = JSON.stringify(compressedTilesData);
+        return rawString;
     }
 }

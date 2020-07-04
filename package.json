@@ -45,10 +45,13 @@
 		"typescript": "^3.9.5"
 	},
 	"dependencies": {
+		"@types/js-base64": "^2.3.2",
 		"chalk": "^4.1.0",
 		"clear": "^0.1.0",
 		"commander": "^5.1.0",
 		"figlet": "^1.4.0",
+		"js-base64": "^2.6.2",
+		"log4js": "^6.3.0",
 		"path": "^0.12.7"
 	},
 	"repository": {
