@@ -141,7 +141,7 @@ export interface TiledLayer {
     type: string,
     xPos: number,
     yPos: number,
-    properties?: Map<string, string>,
+    properties?: Object,
     data?: string,
     height?: number,
     width?: number,
@@ -156,5 +156,5 @@ export interface TiledObject {
     yPos: number,
     xScale: number,
     yScale: number,
-    properties?: Map<string, string>,
+    properties?: Object,
 }

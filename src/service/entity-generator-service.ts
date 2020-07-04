@@ -134,12 +134,16 @@ export class EntityGeneratorService {
 				`\r\n` +
 				parsedEntities.map((entity, index) => {
 					const modelEntry = model.filter(entry => entry.name === entity.className);
-					const prototype = modelEntry ? Object.keys(modelEntry[0].schema).length : entity.prototype;
-					return `` + 
-						`\t#macro ${entity.className} ${beginId + (index + 1)}\r\n` +
-						`\tglobal.entityPrototypes[? ${entity.className}] = ${prototype};\r\n` +
-						`\tglobal.entityClassNames[? ${entity.className}] = "${entity.className}";\r\n` +
-						`\t\r\n`;
+					if (modelEntry.length > 0) {
+						const prototype = Object.keys(modelEntry[0].schema).length;
+						return `` + 
+							`\t#macro ${entity.className} ${beginId + (index + 1)}\r\n` +
+							`\tglobal.entityPrototypes[? ${entity.className}] = ${prototype};\r\n` +
+							`\tglobal.entityClassNames[? ${entity.className}] = "${entity.className}";\r\n` +
+							`\t\r\n`;
+					}
+					return ``;
+
 				}).join("\n")
 
 			writeFileSync(initializeEntiteisPathGML, newEntityDefinition);
