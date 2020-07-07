@@ -15,7 +15,8 @@
 		"coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
 		"dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
 		"dev2": "nodemon --watch 'src/**' --exec \"ts-node\" src/index.ts",
-		"watch": "nodemon src/index.ts"
+		"watch": "nodemon src/index.ts",
+		"debug": "tsc --sourcemap"
 	},
 	"keywords": [
 		"horizon-engine",

@@ -1,7 +1,7 @@
 import log4js from 'log4js';
 import { injectable } from 'inversify';
 import { Base64 } from 'js-base64';
-import { TiledMap, JsonTiledMap, TiledTilesetObject, TiledLayer, TiledTilesetCompressMethod, JsonTiledLayer, JsonTiledLayerType, UndefinedJsonTiledLayerTypeException, JsonTiledObject, JsonTiledLayerProperty, TiledObject, JsonTiledPropertyNotFoundException, JsonTiledTilesOffsetNotFoundException } from '../type/tiled-converter-model';
+import { TiledMap, JsonTiledMap, TiledTilesetObject, TiledLayer, TiledTilesetCompressMethod, JsonTiledLayer, JsonTiledLayerType, UndefinedJsonTiledLayerTypeException, JsonTiledObject, JsonTiledLayerProperty, TiledObject, JsonTiledPropertyNotFoundException, JsonTiledTilesOffsetNotFoundException, VertexBufferGroup, ObjectNotFoundInDictionaryException, VertexBufferGroupNotFoundException, VertexObjectBuffer } from '../type/tiled-converter-model';
 import { POINT_CONVERSION_UNCOMPRESSED } from 'constants';
 
 
@@ -28,13 +28,13 @@ export class TiledConverterService {
 
         const tiledLayers: TiledLayer[] = jsonTiledMap.layers
             .map(layer => this.convertJsonTiledLayerToTiledLayers(
-                layer, tilesetOffsetDictionary, objectDictionary, compressMethod))
+                layer, tilesetOffsetDictionary, objectDictionary, compressMethod, jsonTiledMap.width * jsonTiledMap.tilewidth, jsonTiledMap.height * jsonTiledMap.tileheight))
             .filter(layer => layer);
 
         const tiledMap: TiledMap = {
             name: name,
-            width: jsonTiledMap.width,
-            height: jsonTiledMap.height,
+            width: jsonTiledMap.width * jsonTiledMap.tilewidth,
+            height: jsonTiledMap.height * jsonTiledMap.tileheight,
             layers: tiledLayers,
             tileWidth: jsonTiledMap.tilewidth,
             tileHeight: jsonTiledMap.tileheight,
@@ -51,17 +51,19 @@ export class TiledConverterService {
         jsonTiledLayer: JsonTiledLayer, 
         tilesetOffsetDictionary: Map<string, number>, 
         objectDictionary: Map<number, TiledTilesetObject>,
-        compressMethod: TiledTilesetCompressMethod): TiledLayer {
+        compressMethod: TiledTilesetCompressMethod,
+        mapWidth: number,
+        mapHeight: number): TiledLayer {
             
         const layerType = this.getJsonTiledLayerType(jsonTiledLayer);
         switch (layerType) {
             case JsonTiledLayerType.GROUP:
                 this.logger.info("\tConvert group layer", jsonTiledLayer.name);
-                const tiledGroup = this.convertJsonTiledGroupToTiledLayer(jsonTiledLayer, tilesetOffsetDictionary, objectDictionary, compressMethod);
+                const tiledGroup = this.convertJsonTiledGroupToTiledLayer(jsonTiledLayer, tilesetOffsetDictionary, objectDictionary, compressMethod, mapWidth, mapHeight);
                 return tiledGroup;
             case JsonTiledLayerType.OBJECTS:
                 this.logger.info("\t\tConvert objects layer", jsonTiledLayer.name);
-                const tiledLayer = this.convertJsonTiledLayerToTiledLayerObject(jsonTiledLayer);
+                const tiledLayer = this.convertJsonTiledLayerToTiledLayerObject(jsonTiledLayer, objectDictionary, mapWidth, mapHeight);
                 return tiledLayer;
             case JsonTiledLayerType.TILESET:
                 this.logger.info("\t\tConvert tileset layer", jsonTiledLayer.name);
@@ -88,8 +90,12 @@ export class TiledConverterService {
         }
     }
 
-    private convertJsonTiledGroupToTiledLayer(jsonTiledLayer: JsonTiledLayer, tilesetOffsetDictionary: Map<string, number>, 
-        objectDictionary: Map<number, TiledTilesetObject>, compressMethod: TiledTilesetCompressMethod): TiledLayer {
+    private convertJsonTiledGroupToTiledLayer(jsonTiledLayer: JsonTiledLayer, 
+        tilesetOffsetDictionary: Map<string, number>, 
+        objectDictionary: Map<number, TiledTilesetObject>, 
+        compressMethod: TiledTilesetCompressMethod,
+        mapWidth: number,
+        mapHeight: number): TiledLayer {
 
         const tiledGroup: TiledLayer = {
             id: jsonTiledLayer.id,
@@ -100,7 +106,7 @@ export class TiledConverterService {
             yPos: jsonTiledLayer.y,
             layers: jsonTiledLayer.layers
                 .map(layer => this.convertJsonTiledLayerToTiledLayers(
-                    layer, tilesetOffsetDictionary, objectDictionary, compressMethod))
+                    layer, tilesetOffsetDictionary, objectDictionary, compressMethod, mapWidth, mapHeight))
                 .flat(),
         }
 
@@ -114,7 +120,15 @@ export class TiledConverterService {
         return tiledGroup;
     }
 
-    private convertJsonTiledLayerToTiledLayerObject(jsonTiledLayer: JsonTiledLayer): TiledLayer {
+    private convertJsonTiledLayerToTiledLayerObject(jsonTiledLayer: JsonTiledLayer, 
+        objectDictionary: Map<number, TiledTilesetObject>,
+        mapWidth: number, 
+        mapHeight: number): TiledLayer {
+        
+        const vertexTypes = [
+            "VertexBufferObject"
+        ]
+
         const tiledLayer: TiledLayer = {
             id: jsonTiledLayer.id,
             name: jsonTiledLayer.name,
@@ -122,8 +136,17 @@ export class TiledConverterService {
             type: JsonTiledLayerType.OBJECTS,
             xPos: jsonTiledLayer.x,
             yPos: jsonTiledLayer.y,
-            objects: jsonTiledLayer.objects.map((object: JsonTiledObject) => this.convertJsonTiledObjectToTiledObject(object)),
+            objects: jsonTiledLayer.objects
+                .filter((object: JsonTiledObject) => !vertexTypes.includes(object.type))
+                .map((object: JsonTiledObject) => this.convertJsonTiledObjectToTiledObject(object, objectDictionary)),
         };
+
+        const vertexBufferGroups = this.convertJsonTiledObjectsToVertexBufferGroups(
+            jsonTiledLayer.objects.filter((object: JsonTiledObject) => !vertexTypes.includes(object.type)), 
+            objectDictionary, mapWidth, mapHeight);
+        if (vertexBufferGroups.length > 0) {
+            tiledLayer.vertexBufferGroups = vertexBufferGroups;
+        }
 
         if (jsonTiledLayer.properties) {
             const propertiesObject = {}
@@ -136,14 +159,22 @@ export class TiledConverterService {
         return tiledLayer;
     }
 
-    private convertJsonTiledObjectToTiledObject(object: JsonTiledObject): TiledObject {
+    private convertJsonTiledObjectToTiledObject(object: JsonTiledObject, objectDictionary: Map<number, TiledTilesetObject>): TiledObject {
+
+        const objectTemplate = objectDictionary.get(object.gid);
+        if (!objectTemplate) {
+            throw new ObjectNotFoundInDictionaryException(`Object with gid ${object.gid} wasn't found in objectDictionary. Data: ${JSON.stringify(object)}`);
+        }
+
         const parsedObject: TiledObject = {
             type: object.type,
-            name: object.name,
-            xPos: object.x,
-            yPos: object.y,
-            xScale: object.width,
-            yScale: object.height,
+            texture: objectTemplate.texture,
+            xPos: Math.round(object.x),
+            yPos: Math.round(object.y),
+        }
+
+        if (object.name) {
+            parsedObject.type = name;
         }
 
         if (object.properties) {
@@ -153,8 +184,70 @@ export class TiledConverterService {
             });
             parsedObject.properties = propertiesObject;
         }
-        
+
         return parsedObject;
+    }
+
+    private convertJsonTiledObjectsToVertexBufferGroups(objects: JsonTiledObject[], 
+        objectDictionary: Map<number, TiledTilesetObject>,
+        mapWidth: number,
+        mapHeight: number): VertexBufferGroup[] {
+
+        const chunkWidth = 512; // TODO parameter
+        const chunkHeight = 512; // TODO parameter
+        const chunkHorizontalSize = Math.ceil(mapWidth / chunkWidth);
+        const chunkVerticalSize = Math.ceil(mapHeight / chunkHeight);
+        const chunks = new Array(chunkVerticalSize)
+            .fill(new Array(chunkHorizontalSize)
+                .fill(undefined)
+            );
+
+        objects.forEach(object => {
+            const x = Math.abs(Math.round(object.x));
+            const y = Math.abs(Math.round(object.y));
+            const chunkX = Math.floor(x / chunkWidth);
+            const chunkY = Math.floor(y / chunkHeight);
+            
+            const objectTemplate = objectDictionary.get(object.gid);
+            if (!objectTemplate) {
+                throw new ObjectNotFoundInDictionaryException(`Object with gid ${object.gid}" wasn't found in objectDictionary`);
+            }
+
+            const vertexBufferGroup: VertexBufferGroup = chunks[chunkY][chunkX] ? chunks[chunkY][chunkX] : {
+                chunkCoord: [ chunkX, chunkY ],
+                type: "vertex_buffer",
+                objectBuffer: [],
+            };
+
+            let objectBuffer: VertexObjectBuffer[] = vertexBufferGroup.objectBuffer;
+
+            let vertexObject: VertexObjectBuffer = objectBuffer.find(vertexObject => vertexObject.texture == objectTemplate.texture)
+            if (!vertexObject) {
+                vertexObject = {
+                    texture: objectTemplate.texture,
+                    coords: [],
+                }
+                objectBuffer = [ ...objectBuffer, vertexObject ];
+            }
+            let vertexObjectIndex = objectBuffer.findIndex(vertexObject => vertexObject.texture == objectTemplate.texture);
+            
+            vertexObject.coords = [ ...vertexObject.coords, Math.round(object.x), Math.round(object.y) ];
+            objectBuffer[vertexObjectIndex] = vertexObject;
+            vertexBufferGroup.objectBuffer = objectBuffer;
+
+            chunks[chunkY][chunkX] = vertexBufferGroup;
+        })
+
+        return chunks
+            .map(row => row.filter((vertexBufferGroup: VertexBufferGroup) => vertexBufferGroup))
+            .flat()
+            .map((vertexBufferGroup: VertexBufferGroup) => {
+                return {
+                    chunkCoord: vertexBufferGroup.chunkCoord,
+                    type: vertexBufferGroup.type,
+                    objectBuffer: vertexBufferGroup.objectBuffer,
+                }
+            })
     }
 
     /**
@@ -174,7 +267,6 @@ export class TiledConverterService {
             width: jsonTiledLayer.height,
         }
 
-        
         if (jsonTiledLayer.properties) {
             const propertiesObject = {}
             jsonTiledLayer.properties.forEach(property => {
@@ -237,9 +329,9 @@ export class TiledConverterService {
                 .filter(tileset => tileset.tiles !== undefined)
                 .map(tileset => {
                     return tileset.tiles.map(tile => {
-                        const id = tileset.firstgid;
+                        const id = tileset.firstgid + tile.id;
                         const type = tile.type;
-                        const texture = tile.image
+                        const texture = tile.image.split("/").pop().split(".")[0];
                         return [id, { type: type, texture: texture }] as [number, TiledTilesetObject];
                     })
                 })

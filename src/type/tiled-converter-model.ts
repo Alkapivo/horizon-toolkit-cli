@@ -29,6 +29,18 @@ export class JsonTiledTilesOffsetNotFoundException extends Error {
     }
 }
 
+export class ObjectNotFoundInDictionaryException extends Error {
+    constructor(message: string) {
+        super(`ObjectNotFoundInDictionaryException: ${message}`);
+    }
+}
+
+export class VertexBufferGroupNotFoundException extends Error {
+    constructor(message: string) {
+        super(`VertexBufferGroupNotFoundException: ${message}`);
+    }
+}
+
 /* JsonTiledMap */
 export interface JsonTiledMap {
     width: number,
@@ -146,15 +158,26 @@ export interface TiledLayer {
     height?: number,
     width?: number,
     objects?: TiledObject[],
+    vertexBufferGroups?: VertexBufferGroup[],
     layers?: TiledLayer[],
 }
 
 export interface TiledObject {
     type: string,
-    name: string,
+    name?: string,
     xPos: number,
     yPos: number,
-    xScale: number,
-    yScale: number,
+    texture: string,
     properties?: Object,
+}
+
+export interface VertexBufferGroup {
+    chunkCoord: number[],
+    type: string,
+    objectBuffer: VertexObjectBuffer[],
+}
+
+export interface VertexObjectBuffer {
+    texture: string,
+    coords: number[]
 }
