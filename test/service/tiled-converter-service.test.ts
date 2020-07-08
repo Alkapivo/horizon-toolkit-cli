@@ -1,6 +1,6 @@
 
-import path from "path";
 import DIContanier from "../../src/inversify.config";
+import path from "path";
 import { expect } from "chai";
 import { inject, injectable } from "inversify";
 import { readFileSync, writeFileSync } from "fs";
@@ -20,7 +20,6 @@ export class Dependencies {
         return this.tiledConverterService;
     }
 }
-
 const dependencies = DIContanier.resolve<Dependencies>(Dependencies);
 
 describe('map converter', () => {

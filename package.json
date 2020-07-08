@@ -50,7 +50,10 @@
 		"chalk": "^4.1.0",
 		"clear": "^0.1.0",
 		"commander": "^5.1.0",
+		"convert-excel-to-json": "^1.7.0",
 		"figlet": "^1.4.0",
+		"google-spreadsheet": "^3.0.11",
+		"googleapis": "^39.2.0",
 		"js-base64": "^2.6.2",
 		"log4js": "^6.3.0",
 		"path": "^0.12.7"

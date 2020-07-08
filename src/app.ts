@@ -5,6 +5,7 @@ import clear from 'clear';
 import figlet from 'figlet';
 import log4js from 'log4js';
 import path from 'path';
+import excelToJson from 'convert-excel-to-json';
 import program, { version, CommanderStatic } from 'commander';
 import DIContanier from "./inversify.config";
 import { TiledConverterService } from "./service/tiled-converter-service";
@@ -13,27 +14,35 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'fs';
 import { EntityGeneratorService } from "./service/entity-generator-service";
 import { YYPPackage } from "./type/model";
 import { TiledMap } from "./type/tiled-converter-model";
+import { GoogleSheetApiService } from "./service/google-drive-api-service";
+import { ExcelService } from "./service/excel-service";
 
 @injectable()
 export class Application {
 
 	private tiledConverterService: TiledConverterService;
 	private entityGeneratorService: EntityGeneratorService;
+	private googleDriveService: GoogleSheetApiService;
+	private excelService: ExcelService;
 	private logger: log4js.Logger;
 
 	constructor(
 		@inject(TiledConverterService) tiledConverter: TiledConverterService,
-		@inject(EntityGeneratorService) entityGenerator: EntityGeneratorService) {
+		@inject(EntityGeneratorService) entityGenerator: EntityGeneratorService,
+		@inject(GoogleSheetApiService) googleDriveService: GoogleSheetApiService,
+		@inject(ExcelService) excelService: ExcelService) {
 
 		this.tiledConverterService = tiledConverter;
 		this.entityGeneratorService = entityGenerator;
+		this.googleDriveService = googleDriveService;
+		this.excelService = excelService;
 
 		// TODO wrap
 		this.logger = log4js.getLogger();
 		this.logger.level = "debug";
 	}
 
-	public run(): void {
+	public run() {
 
 		// Empty command
 		if (process.argv.length === 2) {
@@ -78,8 +87,22 @@ export class Application {
 			.command("package")
 			.alias("pkg")
 			.description("Create resourcePackage")
-			.action(() => {
-				const yypPackage = this.getYYPPackage();
+			.action(async () => {
+				//const yypPackage = this.getYYPPackage();
+				const googleDriveRows = await this.googleDriveService.getSheet({
+					sheetId: "12tBtTTIza2TpTgAhpFzPzQfC7gqmzZ7xCqwWeHNFqtc",
+					sheetName: "item",
+					credentialsPath: "secret/credentials.json",
+				});
+				console.log("Google drive rows:", googleDriveRows);
+
+				const xlsxRows = this.excelService.getSheet({
+					sheetName: "item",
+					sheetPath: "item_data.xlsx",
+				})
+				console.log(xlsxRows);
+
+
 			});
 
 		program

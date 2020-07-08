@@ -1,6 +1,6 @@
 export interface YYPPackage {
     name: string,
-    horizonToolkitSettings: {
+    horizonToolkitSettings?: {
         cli?: {
             displayName: string
             font: string
@@ -11,6 +11,9 @@ export interface YYPPackage {
             tiledConvertedPath: string,
             yypPath: string
         }
+    },
+    googleDriveApiSettings?: {
+        credentialsPath: string,
     }
 }
 
