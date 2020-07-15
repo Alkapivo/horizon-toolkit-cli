@@ -573,30 +573,9 @@ export class EntityGeneratorService {
 						break;
 					case FieldTypes.PRIMITIVE_ARRAY:
 						if (isParameterOptional) {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel});` +
-								`\tif (isOptionalPresent(${parameterName})) {\n` +
-								`\t\tif (isJsonArray(${parameterName})) {\n` +
-								`\t\t\t${parameterName} = cloneArray(getJsonArrayData(${parameterName}));\n` +
-								`\t\t} else {\n` +
-								`\t\t\t${parameterName} = [];\n` +
-								`\t\t\tvar exceptionMessage = "[${functionName}] Field \\"${parameterName}\\" isn't an JsonArray";\n` +
-								`\t\t\tthrowException(createException(RuntimeException, exceptionMessage, null));\n` +
-								`\t\t}\n` +
-								`\t}\n` +
-								`\t\n`;
+							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel}, Array);\n`
 						} else {
-							functionBody += `\tvar ${parameterName} = getJsonObjectFieldValue(jsonObject, ${entityLabel});` +
-								`\tif (isOptionalPresent(${parameterName})) {\n` +
-								`\t\tif (isJsonArray(${parameterName})) {\n` +
-								`\t\t\t${parameterName} = cloneArray(getJsonArrayData(${parameterName}));\n` +
-								`\t\t} else {\n` +
-								`\t\t\t${parameterName} = [];\n` +
-								`\t\t\tvar exceptionMessage = "[${functionName}] Field \\"${parameterName}\\" isn't an JsonArray";\n` +
-								`\t\t\tthrowException(createException(RuntimeException, exceptionMessage, null));\n` +
-								`\t\t}\n` +
-								`\t}\n` +
-								`\t${parameterName} = assertNoOptional(${parameterName});\n` + 
-								`\t\n`;
+							functionBody += `\tvar ${parameterName} = assertNoOptional(getJsonObjectFieldValue(jsonObject, ${entityLabel}, Array));\n`
 						}
 						break;
 					case FieldTypes.PRIMITIVE_LIST:
@@ -707,6 +686,7 @@ export class EntityGeneratorService {
 			}
 		}
 
+		functionBody += `\n\tdestroyJsonObject(jsonObject);\n\t`;
 		const returnStatement = `\n\treturn create${entityClassName}(${this.generateFieldsAsCommaSeparatedString(parameters)});\n\t\n`;
 
 		return functionDescription + functionBody + returnStatement;
