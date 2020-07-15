@@ -27,3 +27,6 @@
 # System Files
 .DS_Store
 Thumbs.db
+
+# API tokens
+/secret

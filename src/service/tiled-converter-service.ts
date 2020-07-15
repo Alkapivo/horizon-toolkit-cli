@@ -216,10 +216,10 @@ export class TiledConverterService {
             const vertexBufferGroup: VertexBufferGroup = chunks[chunkY][chunkX] ? chunks[chunkY][chunkX] : {
                 chunkCoord: [ chunkX, chunkY ],
                 type: "vertex_buffer",
-                data: [],
+                objectBuffer: [],
             };
 
-            let objectBuffer: VertexObjectBuffer[] = vertexBufferGroup.data;
+            let objectBuffer: VertexObjectBuffer[] = vertexBufferGroup.objectBuffer;
 
             let vertexObject: VertexObjectBuffer = objectBuffer.find(vertexObject => vertexObject.texture == objectTemplate.texture)
             if (!vertexObject) {
@@ -233,7 +233,7 @@ export class TiledConverterService {
             
             vertexObject.coords = [ ...vertexObject.coords, Math.round(object.x), Math.round(object.y) ];
             objectBuffer[vertexObjectIndex] = vertexObject;
-            vertexBufferGroup.data = objectBuffer;
+            vertexBufferGroup.objectBuffer = objectBuffer;
 
             chunks[chunkY][chunkX] = vertexBufferGroup;
         })
@@ -245,7 +245,7 @@ export class TiledConverterService {
                 return {
                     chunkCoord: vertexBufferGroup.chunkCoord,
                     type: vertexBufferGroup.type,
-                    data: vertexBufferGroup.data,
+                    objectBuffer: vertexBufferGroup.objectBuffer,
                 }
             })
     }
