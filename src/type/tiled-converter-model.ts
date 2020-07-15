@@ -174,7 +174,7 @@ export interface TiledObject {
 export interface VertexBufferGroup {
     chunkCoord: number[],
     type: string,
-    objectBuffer: VertexObjectBuffer[],
+    data: VertexObjectBuffer[],
 }
 
 export interface VertexObjectBuffer {

@@ -579,7 +579,7 @@ export class EntityGeneratorService {
 								`\t\t\t${parameterName} = cloneArray(getJsonArrayData(${parameterName}));\n` +
 								`\t\t} else {\n` +
 								`\t\t\t${parameterName} = [];\n` +
-								`\t\t\tvar exceptionMessage = "[${functionName}] Field \"${parameterName}\" isn't an JsonArray";\n` +
+								`\t\t\tvar exceptionMessage = "[${functionName}] Field \\"${parameterName}\\" isn't an JsonArray";\n` +
 								`\t\t\tthrowException(createException(RuntimeException, exceptionMessage, null));\n` +
 								`\t\t}\n` +
 								`\t}\n` +
@@ -591,7 +591,7 @@ export class EntityGeneratorService {
 								`\t\t\t${parameterName} = cloneArray(getJsonArrayData(${parameterName}));\n` +
 								`\t\t} else {\n` +
 								`\t\t\t${parameterName} = [];\n` +
-								`\t\t\tvar exceptionMessage = "[${functionName}] Field \"${parameterName}\" isn't an JsonArray";\n` +
+								`\t\t\tvar exceptionMessage = "[${functionName}] Field \\"${parameterName}\\" isn't an JsonArray";\n` +
 								`\t\t\tthrowException(createException(RuntimeException, exceptionMessage, null));\n` +
 								`\t\t}\n` +
 								`\t}\n` +
