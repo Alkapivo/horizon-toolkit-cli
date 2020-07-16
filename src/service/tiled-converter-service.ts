@@ -27,6 +27,7 @@ export class TiledConverterService {
         const compressMethod = TiledTilesetCompressMethod.PER_ROW;
 
         const tiledLayers: TiledLayer[] = jsonTiledMap.layers
+            .filter(layer => !layer.name.includes("overlay"))
             .map(layer => this.convertJsonTiledLayerToTiledLayers(
                 layer, tilesetOffsetDictionary, objectDictionary, compressMethod, jsonTiledMap.width * jsonTiledMap.tilewidth, jsonTiledMap.height * jsonTiledMap.tileheight))
             .filter(layer => layer);
@@ -291,6 +292,7 @@ export class TiledConverterService {
         const tilesOffset: number = tilesetOffsetDictionary.get(tilesetName);
 
         if (!tilesOffset) {
+            console.log(tilesetOffsetDictionary);
             throw new JsonTiledTilesOffsetNotFoundException(
                 `offset for tilesetName "${tilesetName}" in layer "${tiledLayer.name}" wasn't found`
             )
