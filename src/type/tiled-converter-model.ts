@@ -172,7 +172,7 @@ export interface TiledObject {
 }
 
 export interface VertexBufferGroup {
-    chunkCoord: number[],
+    chunkCoord: Tuple,
     type: string,
     objectBuffer: VertexObjectBuffer[],
 }
@@ -180,4 +180,9 @@ export interface VertexBufferGroup {
 export interface VertexObjectBuffer {
     texture: string,
     coords: number[]
+}
+
+export interface Tuple {
+    key: any,
+    value: any
 }
