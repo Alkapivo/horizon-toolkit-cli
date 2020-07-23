@@ -14,6 +14,8 @@ import { EntityGeneratorService } from "./service/entity-generator-service";
 import { YYPPackage } from "./type/model";
 import { TiledMap } from "./type/tiled-converter-model";
 import { ItemService } from "./service/item-service";
+import { MobService } from "./service/mob-service";
+import { NPCService } from "./service/npc-service";
 
 @injectable()
 export class Application {
@@ -21,16 +23,22 @@ export class Application {
 	private tiledConverterService: TiledConverterService;
 	private entityGeneratorService: EntityGeneratorService;
 	private itemService: ItemService;
+	private mobService: MobService;
+	private npcService: NPCService;
 	private logger: log4js.Logger;
 
 	constructor(
 		@inject(TiledConverterService) tiledConverter: TiledConverterService,
 		@inject(EntityGeneratorService) entityGenerator: EntityGeneratorService,
-		@inject(ItemService) itemService: ItemService) {
+		@inject(ItemService) itemService: ItemService,
+		@inject(MobService) mobService: MobService,
+		@inject(NPCService) npcService: NPCService) {
 
 		this.tiledConverterService = tiledConverter;
 		this.entityGeneratorService = entityGenerator;
 		this.itemService = itemService;
+		this.mobService = mobService;
+		this.npcService = npcService;
 
 		// TODO wrap
 		this.logger = log4js.getLogger();
@@ -83,24 +91,7 @@ export class Application {
 			.alias("pkg")
 			.description("Create resourcePackage")
 			.action(async () => {
-
-				//const yypPackage = this.getYYPPackage();
-				/*
-				const googleDriveRows = await this.googleDriveService.getSheet({
-					sheetId: "12tBtTTIza2TpTgAhpFzPzQfC7gqmzZ7xCqwWeHNFqtc",
-					sheetName: "item",
-					credentialsPath: "secret/credentials.json",
-				});
-				console.log("Google drive rows:", googleDriveRows);
-
-				const xlsxRows = this.excelService.getSheet({
-					sheetName: "item",
-					sheetPath: "item_data.xlsx",
-				})
-				console.log(xlsxRows);
-				*/
-				this.itemService.buildItems();
-
+				const yypPackage = this.getYYPPackage();
 			});
 
 		program
@@ -135,25 +126,41 @@ export class Application {
 
 		program
 			.command("meat-builder [options...]")
-			.alias("pkg")
+			.alias("mpkg")
 			.description("@Meat: Compiler for: [ npc, mob, item, quest, dialogue, langPack, calendarEvent, timeline ]")
-			.action((options?) => {
+			.action(async (options?) => {
 				const yypPackage = this.getYYPPackage();
-			});
-		
-		program
-			.command("meat-builder")
-			.alias("pkg")
-			.description("@Meat: Compiler for: [ npc, mob, item, quest, dialogue, langPack, calendarEvent, timeline ]")
-			.action(() => {
-				const yypPackage = this.getYYPPackage();
+
+				try {
+					const items = await this.itemService.buildItems();
+					const mobs = await this.mobService.buildMobs();
+					const npcs = await this.npcService.buildNPCs();
+
+					const mpkPath: string = path.posix
+						.normalize(yypPackage.meatSettings.mpkgPath);
+	
+					writeFileSync(
+						`${mpkPath}/item_data.json`,
+						JSON.stringify(items, null, "\t")
+					);
+					writeFileSync(
+						`${mpkPath}/mob_data.json`,
+						JSON.stringify(mobs, null, "\t")
+					);
+					writeFileSync(
+						`${mpkPath}/npc_data.json`,
+						JSON.stringify(npcs, null, "\t")
+					);
+				} catch (exception) {
+					console.error(exception);
+				}
 			});
 
 		this.logger.debug(`Parsing arguments: ${process.argv.toString().split(",").filter(arg => !(arg.includes("node.exe") || arg.includes("app.js"))).join(" ")}`)
 		program.parse(process.argv);
 	}
 
-	public getYYPPackage() {
+	public getYYPPackage(): YYPPackage {
 		const rootPath = path.posix.normalize(process.cwd());
 		const yypPackagePath = `${rootPath}/yyp-package.json`;
 

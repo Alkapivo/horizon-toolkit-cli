@@ -1,3 +1,5 @@
+import { FieldType } from "./game-content-model";
+
 export class ItemTypeNotFoundException extends Error {
     constructor(message: string) {
         super(`ItemTypeNotFound: ${message}`);
@@ -11,7 +13,7 @@ export class ItemParseException extends Error {
 }
 
 export interface Item {
-    id: number,
+    itemId: number,
     name: string,
     type: string,
     texture: string,
@@ -48,11 +50,6 @@ export interface DamageEffect {
 export interface MovementModifier {
     ground?: string[],
     value: number,s
-}
-
-export interface FieldType {
-    name: string,
-    type: string,
 }
 
 export interface ItemFieldsDictionary {

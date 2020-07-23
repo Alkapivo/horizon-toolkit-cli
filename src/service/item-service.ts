@@ -1,13 +1,17 @@
+import log4js from 'log4js';
 import { injectable, inject } from "inversify";
 import { GoogleSheetApiService } from "./google-drive-api-service";
 import { ExcelService } from "./excel-service";
-import { requiredItemFieldsDictionary, ItemTypeNotFoundException, ItemParseException, FieldType, Item, ItemParameter, ItemFieldsDictionary, MovementModifier, DamageEffect } from "../type/item-service-model";
+import { requiredItemFieldsDictionary, ItemTypeNotFoundException, ItemParseException, Item, ItemParameter, ItemFieldsDictionary, MovementModifier, DamageEffect } from "../type/game-content/item-service-model";
+import { assert } from 'console';
+import { FieldType } from '../type/game-content/game-content-model';
 
 @injectable()
 export class ItemService {
     
     private googleDriveService: GoogleSheetApiService;
     private excelService: ExcelService;
+    private logger: log4js.Logger;
 
     private itemSpreadsheetId: string = "12tBtTTIza2TpTgAhpFzPzQfC7gqmzZ7xCqwWeHNFqtc";
 
@@ -17,9 +21,12 @@ export class ItemService {
 
         this.googleDriveService = googleDriveService;
         this.excelService = excelService;
+
+        this.logger = log4js.getLogger();
+		this.logger.level = "debug";
     }
 
-    public async buildItems() {
+    public async buildItems(): Promise<Item[]> {
         const googleDriveRows = await this.googleDriveService.getSheet({
             sheetId: this.itemSpreadsheetId,
             sheetName: "item",
@@ -28,22 +35,32 @@ export class ItemService {
 
         const items: Item[] = googleDriveRows.rows
             .map((row, index) => {
-                if (index == 0) {
+                if (index === 0) {
                     return undefined;
                 }
 
+                let columnIndex = 0;
                 try {
-                    const id = Number(row[0]);
+                    const id = Number(row[0].replace(",", "."));
+                    assert(id !== NaN && id, "itemId is NaN");
+                    columnIndex++;
                     const name = row[1];
+                    columnIndex++;
                     const type = row[2];
+                    columnIndex++;
                     const texture = row[3];
+                    columnIndex++;
                     const isStackable = (row[4] as string).toLowerCase() === "true";
+                    columnIndex++;
                     const description = row[5];
-                    const capacity = Number(row[6]);
+                    columnIndex++;
+                    const capacity = Number(row[6].replace(",", "."));
+                    assert(capacity !== NaN && capacity, "capacity is NaN");
+                    columnIndex++;
                     const parameters = this.parseItemParametersByType(type, JSON.parse(row[7]));
 
-                    const item = {
-                        id: id,
+                    const item: Item = {
+                        itemId: id,
                         name: name,
                         type: type,
                         texture: texture,
@@ -52,14 +69,17 @@ export class ItemService {
                         capacity: capacity,
                         parameters: parameters,
                     }
+
+                    this.logger.info(`Item "${item.name}" parsed.`);
+
                     return item;
                 } catch (exception) {
-                    throw new ItemParseException(`Unable to parse item at excel index ${index + 1}. Message: ${exception}`);
+                    throw new ItemParseException(`Unable to parse item at excel index ${index + 1}. Column: "${googleDriveRows.rows[0][columnIndex]}". Message: ${exception}`);
                 }
             })
             .filter(item => item);
 
-        console.log(items);
+        return items;
     }
 
     private parseItemParametersByType(type: string, parameters: {}): ItemParameter {
@@ -73,7 +93,7 @@ export class ItemService {
             parsedParameters[requiredField.name] = this.parseToType(requiredField.type, parameters[requiredField.name]);
         });
 
-        return parsedParameters;
+        return parsedParameters as ItemParameter;
     }
 
     private parseToType(fieldType: string, data: any): any {

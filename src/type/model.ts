@@ -14,6 +14,9 @@ export interface YYPPackage {
     },
     googleDriveApiSettings?: {
         credentialsPath: string,
+    },
+    meatSettings?: {
+        mpkgPath: string
     }
 }
 
