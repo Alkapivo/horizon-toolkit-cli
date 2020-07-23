@@ -18,14 +18,14 @@ export interface Mob {
     type: string,
     texture: string,
     hp: number,
-    exp: number,
-    statistic: MobStats,
+    experience: number,
+    statistic: MobStatistic,
     behaviours: MobBehaviour[],
     loot: Loot[],
     eq: number[],
 }
 
-export interface MobStats {
+export interface MobStatistic {
     fighting: number,
     defence: number,
     accuracy: number,

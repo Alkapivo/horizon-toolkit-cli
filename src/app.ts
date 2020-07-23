@@ -136,20 +136,17 @@ export class Application {
 					const mobs = await this.mobService.buildMobs();
 					const npcs = await this.npcService.buildNPCs();
 
-					const mpkPath: string = path.posix
+					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
 	
+					const meatPackage = {
+						items: items,
+						mobs: mobs,
+						npcs: npcs,
+					}
 					writeFileSync(
-						`${mpkPath}/item_data.json`,
-						JSON.stringify(items, null, "\t")
-					);
-					writeFileSync(
-						`${mpkPath}/mob_data.json`,
-						JSON.stringify(mobs, null, "\t")
-					);
-					writeFileSync(
-						`${mpkPath}/npc_data.json`,
-						JSON.stringify(npcs, null, "\t")
+						`${mpkgPath}/meat_package.json`,
+						JSON.stringify(meatPackage, null, "\t")
 					);
 				} catch (exception) {
 					console.error(exception);

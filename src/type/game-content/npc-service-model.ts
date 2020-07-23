@@ -19,7 +19,7 @@ export interface NPC {
     dialogue: string,
     tradeInventory: TradeEntry[],
     parameters: NPCParameters,
-    echoes: NPCEcho[]
+    echoes: NPCEcho[],
 }
 
 export interface TradeEntry {

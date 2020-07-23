@@ -28,16 +28,16 @@ export interface ItemParameter {
     defence?: number,
     accuracy?: number,
     movementModifier?: MovementModifier,
-    damageEfects?: DamageEffect[],
+    damageEffects?: DamageEffect[],
 
     ammoType?: string,
     weaponType?: string,
 
     bookContent?: string,
-    doorId?: string
-    goldValue?: number
-    hpRegenerationDuration?: number
-    hpRegeneration?: number
+    doorId?: string,
+    goldValue?: number,
+    hpRegenerationDuration?: number,
+    hpRegeneration?: number,
     isQuestItem?: boolean,
     specialType?: string,
 }
@@ -49,7 +49,7 @@ export interface DamageEffect {
 
 export interface MovementModifier {
     ground?: string[],
-    value: number,s
+    value: number,
 }
 
 export interface ItemFieldsDictionary {

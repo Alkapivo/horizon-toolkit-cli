@@ -2,7 +2,7 @@ import log4js from 'log4js';
 import { injectable, inject } from "inversify";
 import { GoogleSheetApiService } from "./google-drive-api-service";
 import { ExcelService } from "./excel-service";
-import { Mob, MobParseException, MobStats, MobBehaviour, Loot, MobBehaviourFieldsDictionary, requiredMobBehaviourFieldsDictionary, MobTypeNotFoundException } from "../type/game-content/mob-service-model";
+import { Mob, MobParseException, MobStatistic, MobBehaviour, Loot, MobBehaviourFieldsDictionary, requiredMobBehaviourFieldsDictionary, MobTypeNotFoundException } from "../type/game-content/mob-service-model";
 import { FieldType } from '../type/game-content/game-content-model';
 import { assert } from 'console';
 
@@ -56,7 +56,7 @@ export class MobService {
                     const exp = Number(row[5].replace(",", "."));
                     assert(exp !== NaN && exp, "exp is NaN");
                     columnIndex++;
-                    const statistic = (JSON.parse(row[6]) as MobStats);
+                    const statistic = (JSON.parse(row[6]) as MobStatistic);
                     columnIndex++;
                     const behaviours = (JSON.parse(row[7]) as MobBehaviour[])
                         .map(behaviour => this.parseMobBehaviour(behaviour));
@@ -71,7 +71,7 @@ export class MobService {
                         type: type,
                         texture: texture,
                         hp: hp,
-                        exp: exp,
+                        experience: exp,
                         statistic: statistic,
                         behaviours: behaviours,
                         loot: loot,
