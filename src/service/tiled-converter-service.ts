@@ -289,13 +289,11 @@ export class TiledConverterService {
         });
 
         const tilesetName: string = tiledLayer.properties['tilesetName'];
-        const tilesOffset: number = tilesetOffsetDictionary.get(tilesetName);
+        let tilesOffset: number = tilesetOffsetDictionary.get(tilesetName);
 
         if (!tilesOffset) {
-            console.log(tilesetOffsetDictionary);
-            throw new JsonTiledTilesOffsetNotFoundException(
-                `offset for tilesetName "${tilesetName}" in layer "${tiledLayer.name}" wasn't found`
-            )
+            console.log(`Offset for tileset "${tilesetName}" in layer "${tiledLayer.name}" wasn't found.\n`, tilesetOffsetDictionary);
+            tilesOffset = NaN;
         }
 
         const tilesData: number[][] = this.convertJsonTiledLayerTileDataTo2DArray(
@@ -316,10 +314,14 @@ export class TiledConverterService {
 
     private getTilesetOffsetDictionaryFromJsonTiledMap(jsonTiledMap: JsonTiledMap): Map<string, number> {
         // Key is tileset name, value is tileset tiled offset
+        console.log("Tileset dictionaries:");
         return new Map<string, number>(
             jsonTiledMap.tilesets
                 .filter(tileset => tileset.image)
-                .map(tileset => [ tileset.name, tileset.firstgid ])
+                .map(tileset => {
+                    console.log("name:", tileset.name, "firstgid:", tileset.firstgid)
+                    return [ tileset.name, tileset.firstgid ]
+                })
         );
     }
 
@@ -350,7 +352,19 @@ export class TiledConverterService {
     }
 
     private removeJsonTiledTilesDataOffset(tileData: number[], offset: number): number[] {
-        return tileData.map(tile => tile > 0 ? tile - offset : tile)
+        return tileData.map(tile => {
+            if (tile > 0) {
+                if (offset === NaN) {
+                    throw new JsonTiledTilesOffsetNotFoundException(
+                        `cannot calculate offset`
+                    )
+                }
+                return tile - offset;
+            }
+            else {
+                return tile
+            }
+        });
     }
 
     private compressTilesDataPerRow(tilesData: number[][]): string {
