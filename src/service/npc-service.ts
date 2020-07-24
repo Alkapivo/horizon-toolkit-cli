@@ -41,13 +41,11 @@ export class NPCService {
 
                 let columnIndex = 0;
                 try {
-                    const id = Number(row[0].replace(",", "."));
+                    const id = row[0];
                     columnIndex++;
-                    assert(id !== NaN, "npcId is NaN");
                     const name = row[1];
                     columnIndex++;
-                    const mobId = Number(row[2].replace(",", "."));
-                    assert(mobId !== NaN, "mobId is NaN");
+                    const mobId = row[2];
                     columnIndex++;
                     const dialogue = row[3];
                     columnIndex++;

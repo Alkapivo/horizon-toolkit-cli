@@ -13,9 +13,9 @@ export class NPCParseException extends Error {
 }
 
 export interface NPC {
-    npcId: number,
+    npcId: string,
     name: string,
-    mobId: number,
+    mobId: string,
     dialogue: string,
     tradeInventory: TradeEntry[],
     parameters: NPCParameters,

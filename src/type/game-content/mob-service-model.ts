@@ -13,7 +13,7 @@ export class MobParseException extends Error {
 }
 
 export interface Mob {
-    mobId: number,
+    mobId: string,
     name: string,
     type: string,
     texture: string,

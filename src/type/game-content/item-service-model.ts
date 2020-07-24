@@ -13,7 +13,7 @@ export class ItemParseException extends Error {
 }
 
 export interface Item {
-    itemId: number,
+    itemId: string,
     name: string,
     type: string,
     texture: string,

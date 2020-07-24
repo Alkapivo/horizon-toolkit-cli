@@ -16,6 +16,7 @@ import { TiledMap } from "./type/tiled-converter-model";
 import { ItemService } from "./service/item-service";
 import { MobService } from "./service/mob-service";
 import { NPCService } from "./service/npc-service";
+import { DialogueService } from "./service/dialogue-service";
 
 @injectable()
 export class Application {
@@ -25,6 +26,7 @@ export class Application {
 	private itemService: ItemService;
 	private mobService: MobService;
 	private npcService: NPCService;
+	private dialogueService: DialogueService;
 	private logger: log4js.Logger;
 
 	constructor(
@@ -32,13 +34,15 @@ export class Application {
 		@inject(EntityGeneratorService) entityGenerator: EntityGeneratorService,
 		@inject(ItemService) itemService: ItemService,
 		@inject(MobService) mobService: MobService,
-		@inject(NPCService) npcService: NPCService) {
+		@inject(NPCService) npcService: NPCService,
+		@inject(DialogueService) dialogueService: DialogueService) {
 
 		this.tiledConverterService = tiledConverter;
 		this.entityGeneratorService = entityGenerator;
 		this.itemService = itemService;
 		this.mobService = mobService;
 		this.npcService = npcService;
+		this.dialogueService = dialogueService;
 
 		// TODO wrap
 		this.logger = log4js.getLogger();
@@ -95,11 +99,37 @@ export class Application {
 			});
 
 		program
-			.command("build")
-			.alias("b")
-			.description("Build project")
+			.command("dialogues")
+			.alias("d")
+			.description("Build dialogues")
 			.action(() => {
 				const yypPackage = this.getYYPPackage();
+
+				const dialogueModelPath = path.posix
+						.normalize(yypPackage.meatSettings.dialoguePath);
+					const dialoguePaths: any[] = JSON.parse(readFileSync(dialogueModelPath + "/model.json").toString())
+						.map(entry => {
+							return {
+								name: entry.name,
+								dialogue: JSON.parse(readFileSync(
+									path.posix
+										.normalize(dialogueModelPath + "/" + entry.path)
+									).toString()
+								),
+							}
+					});
+
+				const dialogues = dialoguePaths
+					.map(entry => this.dialogueService.buildDialogue(entry.name, entry.dialogue))
+				
+				const dialoguesPackage = {
+					dialogues: dialogues
+				}
+				
+				writeFileSync(path.posix
+					.normalize(yypPackage.meatSettings.mpkgPath + "/dialogues.json"), 
+						JSON.stringify(dialoguesPackage, null, "\t")
+				);
 			});
 
 		program
@@ -127,7 +157,7 @@ export class Application {
 		program
 			.command("meat-builder [options...]")
 			.alias("mpkg")
-			.description("@Meat: Compiler for: [ npc, mob, item, quest, dialogue, langPack, calendarEvent, timeline ]")
+			.description("@Meat: Compiler for: [ npc, mob, item, dialogue ]")
 			.action(async (options?) => {
 				const yypPackage = this.getYYPPackage();
 
@@ -136,6 +166,24 @@ export class Application {
 					const mobs = await this.mobService.buildMobs();
 					const npcs = await this.npcService.buildNPCs();
 
+
+					const dialogueModelPath = path.posix
+						.normalize(yypPackage.meatSettings.dialoguePath);
+					const dialoguePaths: any[] = JSON.parse(readFileSync(dialogueModelPath + "/model.json").toString())
+						.map(entry => {
+							return {
+								name: entry.name,
+								dialogue: JSON.parse(readFileSync(
+									path.posix
+										.normalize(dialogueModelPath + "/" + entry.path)
+									).toString()
+								),
+							}
+					});
+					const dialogues = dialoguePaths
+						.map(entry => this.dialogueService.buildDialogue(entry.name, entry.dialogue))
+
+
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
 	
@@ -143,7 +191,9 @@ export class Application {
 						items: items,
 						mobs: mobs,
 						npcs: npcs,
+						dialogues: dialogues
 					}
+
 					writeFileSync(
 						`${mpkgPath}/meat_package.json`,
 						JSON.stringify(meatPackage, null, "\t")

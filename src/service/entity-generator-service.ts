@@ -720,13 +720,13 @@ export class EntityGeneratorService {
 				}
 			}).join("")}`;
 
-		functionBody += hasFields ? `\n\t${entries}` : "";
+		functionBody += hasFields ? `\n\t${entries}\n\t\n` : "";
 
-		let isFirst = true;
 		for (const key of Object.keys(parameters)) {
 			const parameterName = this.initialToLower(key);
 			const parameterType = parameters[key];
 			const fieldType = this.getFieldTypeFromParameterType(parameterType, JSON.parse(entity.primitives), JSON.parse(entity.enums));
+			const isOptional = parameterType.includes("Optional<");
 
 			const fieldSetter = function(value) {
 				return `set${entityClassName}${this.initialToUpper(parameterName)}(${entityObjectName}, ${value})`;
@@ -738,52 +738,80 @@ export class EntityGeneratorService {
 			if (fieldType.toLowerCase().includes("primitive")) {
 				switch (fieldType) {
 					case FieldTypes.PRIMITIVE_ARRAY:
-						functionBody += 
-							(isFirst ? "\n\t" : "") + 
-							`\n\t${fieldSetter("null")};`
-						isFirst = false;
+						functionBody +=
+							`\t${fieldSetter("null")};\n\t\n`;
 						break;
 					case FieldTypes.PRIMITIVE_LIST:
-						functionBody += 
-							(isFirst ? "\n\t" : "") + 
-							`\n\t${dataStructureDestroyer(parameterName, CollectionTypes.LIST)};` +
-							`\n\t${fieldSetter("null")};`;
-						isFirst = false;
+						functionBody +=
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` + 
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.LIST)};\n` + 
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.LIST)};\n` + 
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 					case FieldTypes.PRIMITIVE_MAP:
-						functionBody += 
-							(isFirst ? "\n\t" : "") + 
-							`\n\t${dataStructureDestroyer(parameterName, CollectionTypes.MAP)};` +
-							`\n\t${fieldSetter("null")};`;
-						isFirst = false;
+						functionBody +=
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` + 
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.MAP)};\n` + 
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.MAP)};\n` + 
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 					case FieldTypes.PRIMITIVE_STACK:
 						functionBody +=
-							(isFirst ? "\n\t" : "") + 
-							`\n\t${dataStructureDestroyer(parameterName, CollectionTypes.STACK)};` +
-							`\n\t${fieldSetter("null")};`;
-						isFirst = false;
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` + 
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.STACK)};\n` + 
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.STACK)};\n` + 
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 					case FieldTypes.PRIMITIVE_GRID:
 						functionBody +=
-							(isFirst ? "\n\t" : "") + 
-							`\n\t${dataStructureDestroyer(parameterName, CollectionTypes.GRID)};` +
-							`\n\t${fieldSetter("null")};`;
-						isFirst = false;
+						isOptional ? (
+							`\tif (isOptionalPresent(${parameterName})) {\n` + 
+							`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.GRID)};\n` + 
+							`\t}\n` +
+							`\t${fieldSetter("null")};\n\t\n`
+						) : (
+							`\t${dataStructureDestroyer(parameterName, CollectionTypes.GRID)};\n` + 
+							`\t${fieldSetter("null")};\n\t\n`
+						)
 						break;
 					case FieldTypes.PRIMITIVE_QUEUE:
 						functionBody +=
-							(isFirst ? "\n\t" : "") + 
-							`\n\t${dataStructureDestroyer(parameterName, CollectionTypes.QUEUE)};` +
-							`\n\t${fieldSetter("null")};`;
-						isFirst = false;
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` + 
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.QUEUE)};\n` + 
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.QUEUE)};\n` + 
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 					case FieldTypes.PRIMITIVE_PRIORITY_QUEUE:
 						functionBody +=
-							(isFirst ? "\n\t" : "") + 
-							`\n\t${dataStructureDestroyer(parameterName, CollectionTypes.PRIORITY_QUEUE)};` +
-							`\n\t${fieldSetter("null")};`;
-						isFirst = false;
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` + 
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.PRIORITY_QUEUE)};\n` + 
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.PRIORITY_QUEUE)};\n` + 
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 				}
 			}
@@ -803,101 +831,163 @@ export class EntityGeneratorService {
 					case FieldTypes.ENTITY:
 						fieldEntityClass = parameterType;
 						functionBody += 
-							(isFirst ? "\n\t" : "") + 
-							`\n\t${entityDestroyer(fieldEntityClass, parameterName)};\n`
-						isFirst = false;
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
+								`\t\t${entityDestroyer(fieldEntityClass, parameterName)};\n` +
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\t${entityDestroyer(fieldEntityClass, parameterName)};\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							)
 						break;
 					case FieldTypes.ENTITY_ARRAY:
 						fieldEntityClass = parameterType.replace("[]", "");
 						functionBody += 
-							(isFirst ? "\n\t" : "") + 
-							`\n\t\n` +
-							`\tfor (var index = 0; index < getArrayLength(${parameterName}); index++) {\n`+
-							`\t\tvar entity = ${parameterName}[@ index];\n` +
-							`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
-							`\t}\n` +
-							`\t${fieldSetter("null")};`;
-						isFirst = false;
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
+								`\t\tfor (var index = 0; index < getArrayLength(${parameterName}); index++) {\n`+
+								`\t\t\tvar entity = ${parameterName}[@ index];\n` +
+								`\t\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t\t}\n` +
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\tfor (var index = 0; index < getArrayLength(${parameterName}); index++) {\n`+
+								`\t\tvar entity = ${parameterName}[@ index];\n` +
+								`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							)
 						break;
 					case FieldTypes.ENTITY_LIST:
 						fieldEntityClass = parameterType.replace("List<", "").replace(">", "");
-						functionBody += 
-							(isFirst ? "\n\t" : "") + 
-							`\n\t\n` +
-							`\tfor (var index = 0; index < ds_list_size(${parameterName}); index++) {\n`+
-							`\t\tvar entity = ${parameterName}[| index];\n` +
-							`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
-							`\t}\n` +
-							`\t${dataStructureDestroyer(parameterName, CollectionTypes.LIST)};\n` +
-							`\t${fieldSetter("null")};`;
-						isFirst = false;
+						functionBody +=
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
+								`\t\tfor (var index = 0; index < getListSize(${parameterName}); index++) {\n` +
+								`\t\t\tvar entity = ${parameterName}[| index];\n` +
+								`\t\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t\t}\n` +
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.LIST)};\n` +
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\tfor (var index = 0; index < getListSize(${parameterName}); index++) {\n` +
+								`\t\tvar entity = ${parameterName}[| index];\n` +
+								`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t}\n` +
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.LIST)};\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 					case FieldTypes.ENTITY_MAP:
 						fieldEntityClass = parameterType.replace("Map<", "").replace(">", "").split("::")[1].replace(" ", "");
-						functionBody += 
-							(isFirst ? "\n\t" : "") + 
-							`\n\t\n` +
-							`\tfor (var key = mapFirst(${parameterName}); iteratorFinish(key); key = mapNext(${parameterName}, key)) {\n`+
-							`\t\tvar entity = ${parameterName}[? key];\n` +
-							`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
-							`\t}\n` +
-							`\t${dataStructureDestroyer(parameterName, CollectionTypes.MAP)};\n` +
-							`\t${fieldSetter("null")};`;
-						isFirst = false;
+						functionBody +=
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
+								`\t\tfor (var key = mapFirst(${parameterName}); iteratorFinish(key); key = mapNext(${parameterName}, key)) {\n` +
+								`\t\t\tvar entity = ${parameterName}[? key];\n` +
+								`\t\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t\t}\n` +
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.MAP)};\n` +
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\tfor (var key = mapFirst(${parameterName}); iteratorFinish(key); key = mapNext(${parameterName}, key)) {\n` +
+								`\t\tvar entity = ${parameterName}[? key];\n` +
+								`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t}\n` +
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.MAP)};\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 					case FieldTypes.ENTITY_STACK:
-						fieldEntityClass = parameterType.replace("Stack<", "").replace(">", "");
 						functionBody +=
-							(isFirst ? "\n\t" : "") + 
-							`\n\t\n` +
-							`\tfor (var index = 0; index < getStackLength(${parameterName}); index++) {\n` +
-							`\t\tvar entity = popStack(${parameterName});\n` + 
-							`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
-							`\t}\n` +
-							`\t${dataStructureDestroyer(parameterName, CollectionTypes.STACK)};\n` +
-							`\t${fieldSetter("null")};`;
-						isFirst = false;
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
+								`\t\tfor (var index = 0; index < getStackSize(${parameterName}); index++) {\n` +
+								`\t\t\tvar entity = popStack(${parameterName});\n` +
+								`\t\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t\t}\n` +
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.STACK)};\n` +
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\tfor (var index = 0; index < getStackSize(${parameterName}); index++) {\n` +
+								`\t\tvar entity = popStack(${parameterName});\n` +
+								`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t}\n` +
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.STACK)};\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 					case FieldTypes.ENTITY_GRID:
 						fieldEntityClass = parameterType.replace("Grid<", "").replace(">", "");
 						functionBody +=
-							(isFirst ? "\n\t" : "") + 
-							`\n\t\n` +
-							`\tfor (var yIndex = 0; yIndex < getGridHeight(${parameterName}); yIndex++) {\n` +
-							`\t\tfor (var xIndex = 0; xIndex < getGridWidth(${parameterName}); xIndex++) {\n` +
-							`\t\t\tvar entity = ${parameterName}[# xIndex, yIndex];\n` +
-							`\t\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
-							`\t\t}\n` +
-							`\t}\n` +
-							`\t${dataStructureDestroyer(parameterName, CollectionTypes.GRID)};\n` +
-							`\t${fieldSetter("null")};`;
-						isFirst = false;
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n}` +
+								`\t\tfor (var yIndex = 0; yIndex < getGridHeight(${parameterName}); yIndex++) {\n` +
+								`\t\t\tfor (var xIndex = 0; xIndex < getGridWidth(${parameterName}); xIndex++) {\n` +
+								`\t\t\t\tvar entity = ${parameterName}[# xIndex, yIndex];\n` +
+								`\t\t\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t\t\t}\n` +
+								`\t\t}\n` +
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.GRID)};\n` +
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\tfor (var yIndex = 0; yIndex < getGridHeight(${parameterName}); yIndex++) {\n` +
+								`\t\tfor (var xIndex = 0; xIndex < getGridWidth(${parameterName}); xIndex++) {\n` +
+								`\t\t\tvar entity = ${parameterName}[# xIndex, yIndex];\n` +
+								`\t\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t\t}\n` +
+								`\t}\n` +
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.GRID)};\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							)
 						break;
 					case FieldTypes.ENTITY_QUEUE:
 						fieldEntityClass = parameterType.replace("Queue<", "").replace(">", "");
 						functionBody +=
-							(isFirst ? "\n\t" : "") + 
-							`\n\t\n` +
-							`\tfor (var index = 0; index < getQueueLength(${parameterName}); index++) {\n` +
-							`\t\tvar entity = popQueue(${parameterName});\n` + 
-							`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
-							`\t}\n` +
-							`\t${dataStructureDestroyer(parameterName, CollectionTypes.QUEUE)};\n` +
-							`\t${fieldSetter("null")};`;
-						isFirst = false;
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
+								`\t\tfor (var index = 0; index < getQueueSize(${parameterName}); index++) {\n` +
+								`\t\t\tvar entity = popQueue(${parameterName});\n` +
+								`\t\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t\t}\n` +
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.QUEUE)};\n` +
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\tfor (var index = 0; index < getQueueSize(${parameterName}); index++) {\n` +
+								`\t\tvar entity = popQueue(${parameterName});\n` +
+								`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t}\n` +
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.QUEUE)};\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 					case FieldTypes.ENTITY_PRIORITY_QUEUE:
 						fieldEntityClass = parameterType.replace("PriorityQueue<", "").replace(">", "");
 						functionBody +=
-							(isFirst ? "\n\t" : "") + 
-							`\n\t\n` +
-							`\tfor (var index = 0; index < getPriorityQueueLength(${parameterName}); index++) {\n` +
-							`\t\tvar entity = popMinPriorityQueue(${parameterName});\n` + 
-							`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
-							`\t}\n` +
-							`\t${dataStructureDestroyer(parameterName, CollectionTypes.PRIORITY_QUEUE)};\n` +
-							`\t${fieldSetter("null")};`;
-						isFirst = false;
+							isOptional ? (
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
+								`\t\tfor (var index = 0; index < getPriorityQueueSize(${parameterName}); index++) {\n` +
+								`\t\t\tvar entity = popMinPriorityQueue(${parameterName});\n` +
+								`\t\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t\t}\n` +
+								`\t\t${dataStructureDestroyer(parameterName, CollectionTypes.PRIORITY_QUEUE)};\n` +
+								`\t}\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							) : (
+								`\tfor (var index = 0; index < getPriorityQueueSize(${parameterName}); index++) {\n` +
+								`\t\tvar entity = popMinPriorityQueue(${parameterName});\n` +
+								`\t\t${entityDestroyer(fieldEntityClass, "entity")};\n` +
+								`\t}\n` +
+								`\t${dataStructureDestroyer(parameterName, CollectionTypes.PRIORITY_QUEUE)};\n` +
+								`\t${fieldSetter("null")};\n\t\n`
+							);
 						break;
 				}
 			}

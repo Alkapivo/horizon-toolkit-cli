@@ -41,8 +41,7 @@ export class ItemService {
 
                 let columnIndex = 0;
                 try {
-                    const id = Number(row[0].replace(",", "."));
-                    assert(id !== NaN && id, "itemId is NaN");
+                    const id = row[0];
                     columnIndex++;
                     const name = row[1];
                     columnIndex++;
