@@ -819,10 +819,8 @@ export class EntityGeneratorService {
 			if (fieldType.toLowerCase().includes("entity")) {
 				let fieldEntityClass = "";
 
-				const entityDestroyer = function(fieldEntityClass, entity) {
-					const escapedFieldEntityClass = fieldEntityClass.includes("Optional<") ?
-					fieldEntityClass.replace("Optional<", "").slice(0, -1) :
-					fieldEntityClass;
+				const entityDestroyer = function(parameterType, entity) {
+					const escapedFieldEntityClass = this.getEscapedParameterType(parameterType);
 					return `destroy${this.initialToUpper(escapedFieldEntityClass)}(${entity})`;
 				}.bind(this);
 				debugger;
@@ -926,7 +924,7 @@ export class EntityGeneratorService {
 						fieldEntityClass = parameterType.replace("Grid<", "").replace(">", "");
 						functionBody +=
 							isOptional ? (
-								`\tif (isOptionalPresent(${parameterName})) {\n}` +
+								`\tif (isOptionalPresent(${parameterName})) {\n` +
 								`\t\tfor (var yIndex = 0; yIndex < getGridHeight(${parameterName}); yIndex++) {\n` +
 								`\t\t\tfor (var xIndex = 0; xIndex < getGridWidth(${parameterName}); xIndex++) {\n` +
 								`\t\t\t\tvar entity = ${parameterName}[# xIndex, yIndex];\n` +

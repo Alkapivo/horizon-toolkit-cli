@@ -188,9 +188,9 @@ export class Application {
 						.normalize(yypPackage.meatSettings.mpkgPath);
 	
 					const meatPackage = {
-						items: items,
-						mobs: mobs,
-						npcs: npcs,
+						itemPrototypes: items,
+						mobPrototypes: mobs,
+						npcPrototypes: npcs,
 						dialogues: dialogues
 					}
 
