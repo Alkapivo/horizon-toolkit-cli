@@ -78,8 +78,29 @@ export class EntityGeneratorService {
 						if (existsSync(assetScriptPathGML) && (readFileSync(assetScriptPathGML).toString().includes("///@override"))) {
 							console.warn("File", gmlSnippet.scriptName + ".gml", "couldn't be saved - @override exists");
 						} else {
-							writeFileSync(assetScriptPathGML, gmlSnippet.gml);
-							//console.info("> Saved file", gmlSnippet.scriptName + ".gml");
+                            let sourceGML = "";
+                            try {
+                                sourceGML = readFileSync(assetScriptPathGML).toString();
+                            } catch (ee) {}
+
+							const sourceLines = sourceGML.split("\n").filter(line => !line.includes("///@generated")).map(line => line);
+							const newLines = gmlSnippet.gml.split("\n").filter(line => !line.includes("///@generated")).map(line => line);
+							
+							if (newLines.length != sourceLines.length) {
+								writeFileSync(assetScriptPathGML, gmlSnippet.gml);
+								console.info("> Saved file", gmlSnippet.scriptName + ".gml");
+							} else {
+								let areEqual = true;
+								sourceLines.forEach((line, index) => {
+									if (line !== newLines[index]) {
+										areEqual = false;
+									}
+								});
+								if (!areEqual) {
+									writeFileSync(assetScriptPathGML, gmlSnippet.gml);
+									console.info("> Saved file", gmlSnippet.scriptName + ".gml");
+								}
+							}
 						}
 					} catch (ex) {
 						console.error("ReadFileException", ex);
@@ -711,15 +732,11 @@ export class EntityGeneratorService {
 				const parameterName = field[0];
 				const parameterType = field[1];
 				const fieldType = this.getFieldTypeFromParameterType(parameterType, primitives, enums);
-				if ((fieldType === FieldTypes.PRIMITIVE_LIST) ||
-					(fieldType === FieldTypes.PRIMITIVE_MAP) ||
-					(fieldType.includes("entity"))) {
-					const fieldGetter = `get${entityClassName}${this.initialToUpper(parameterName)}(${entityObjectName})`;
-					hasFields = true;
-					return `\n\tvar ${parameterName} = ${fieldGetter};`
-				}
+				const fieldGetter = `get${entityClassName}${this.initialToUpper(parameterName)}(${entityObjectName})`;
+				hasFields = true;
+				return `\n\tvar ${parameterName} = ${fieldGetter};`
 			}).join("")}`;
-
+		
 		functionBody += hasFields ? `\n\t${entries}\n\t\n` : "";
 
 		for (const key of Object.keys(parameters)) {

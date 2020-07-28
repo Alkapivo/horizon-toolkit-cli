@@ -55,6 +55,7 @@ export class ItemService {
                     columnIndex++;
                     const capacity = Number(row[6].replace(",", "."));
                     assert(capacity !== NaN && capacity, "capacity is NaN");
+                    console.log(capacity);
                     columnIndex++;
                     const parameters = this.parseItemParametersByType(type, JSON.parse(row[7]));
 
