@@ -247,7 +247,10 @@ export class TiledConverterService {
             .filter((vertexBufferGroup: VertexBufferGroup) => vertexBufferGroup)
             .map((vertexBufferGroup: VertexBufferGroup) => {
                 return {
-                    chunkCoord: vertexBufferGroup.chunkCoord,
+                    chunkCoord: {
+                        key: vertexBufferGroup.chunkCoord[0],
+                        value: vertexBufferGroup.chunkCoord[1],
+                    },
                     type: vertexBufferGroup.type,
                     objectBuffer: vertexBufferGroup.objectBuffer,
                 }
