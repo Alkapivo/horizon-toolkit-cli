@@ -17,6 +17,7 @@ import { ItemService } from "./service/item-service";
 import { MobService } from "./service/mob-service";
 import { NPCService } from "./service/npc-service";
 import { DialogueService } from "./service/dialogue-service";
+import { ChestPrototype } from "./type/game-content/game-content-model";
 
 @injectable()
 export class Application {
@@ -183,6 +184,12 @@ export class Application {
 					const dialogues = dialoguePaths
 						.map(entry => this.dialogueService.buildDialogue(entry.name, entry.dialogue))
 
+					const chestModelPath = path.posix
+						.normalize(yypPackage.meatSettings.chestsPath);
+					const chestsJson = JSON.parse(readFileSync(chestModelPath).toString()) as ChestPrototype[];
+					chestsJson.forEach(chest => this.logger.info(`Chest ${chest.chestId} parsed.`));
+					const chests = chestsJson
+
 
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
@@ -191,6 +198,7 @@ export class Application {
 						itemPrototypes: items,
 						mobPrototypes: mobs,
 						npcPrototypes: npcs,
+						chestPrototypes: chests,
 						dialogues: dialogues
 					}
 

@@ -133,7 +133,7 @@ export interface TiledTilesetObject {
 /* TiledMap */
 export enum TiledTilesetCompressMethod {
     NONE = 0,
-    PER_ROW = 1,
+    PER_ROW = 1
 }
 
 export interface TiledMap {
