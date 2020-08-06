@@ -13,3 +13,13 @@ export interface MeatPackage {
     mobs: Mob[],
     npcs: NPC[],
 }
+
+export interface Tuple<T, S> {
+    key: T,
+    value: S
+}
+
+export interface ChestPrototype {
+    chestId: String,
+    items: Tuple<string, number>,
+}

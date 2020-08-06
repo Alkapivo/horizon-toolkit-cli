@@ -18,6 +18,7 @@ export interface YYPPackage {
     meatSettings?: {
         mpkgPath: string,
         dialoguePath: string,
+        chestsPath: string
     }
 }
 

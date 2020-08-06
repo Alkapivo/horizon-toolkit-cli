@@ -175,7 +175,7 @@ export class TiledConverterService {
         }
 
         if (object.name) {
-            parsedObject.type = name;
+            parsedObject.type = object.name;
         }
 
         if (object.properties) {
@@ -214,6 +214,8 @@ export class TiledConverterService {
                 throw new ObjectNotFoundInDictionaryException(`Object with gid ${object.gid}" wasn't found in objectDictionary`);
             }
 
+            const vertexBufferGroup = undefined
+            /*
             const vertexBufferGroup: VertexBufferGroup = chunks[chunkY][chunkX] ? chunks[chunkY][chunkX] : {
                 chunkCoord: [ chunkX, chunkY ],
                 type: "vertex_buffer",
@@ -235,7 +237,7 @@ export class TiledConverterService {
             vertexObject.coords = [ ...vertexObject.coords, Math.round(object.x), Math.round(object.y) ];
             objectBuffer[vertexObjectIndex] = vertexObject;
             vertexBufferGroup.objectBuffer = objectBuffer;
-
+            */
             chunks[chunkY][chunkX] = vertexBufferGroup;
         })
 

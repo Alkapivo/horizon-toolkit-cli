@@ -47,7 +47,7 @@ export class EntityGeneratorService {
 			});
 		entities.forEach(entity => {
 			const codeSnippets = this.generateEntityCode(entity);
-			console.info("Save", entity.name);
+			console.info("Parse", entity.name);
 			codeSnippets.forEach(snippet => {
 				this.codeSnippetsWriter(snippet, yypPath, projectName);
 			});
