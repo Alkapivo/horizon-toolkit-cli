@@ -127,7 +127,8 @@ export class TiledConverterService {
         mapHeight: number): TiledLayer {
 
         const vertexTypes = [
-            "VertexBufferObject"
+            "VertexBufferObject",
+            "SimpleDecorator"
         ]
 
         const tiledLayer: TiledLayer = {
