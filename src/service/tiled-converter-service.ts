@@ -128,7 +128,8 @@ export class TiledConverterService {
 
         const vertexTypes = [
             "VertexBufferObject",
-            "SimpleDecorator"
+            "SimpleDecorator",
+            "SimpleFlatDecorator"
         ]
 
         const tiledLayer: TiledLayer = {
@@ -146,7 +147,7 @@ export class TiledConverterService {
         const vertexBufferGroups = this.convertJsonTiledObjectsToVertexBufferGroups(
             jsonTiledLayer.objects
                 .filter((object: JsonTiledObject) => vertexTypes.includes(object.type)),
-            objectDictionary, mapWidth, mapHeight);
+            objectDictionary, mapWidth, mapHeight, vertexTypes);
         if (vertexBufferGroups.length > 0) {
             tiledLayer.vertexBufferGroups = vertexBufferGroups;
         }
@@ -195,7 +196,8 @@ export class TiledConverterService {
         objects: JsonTiledObject[],
         objectDictionary: Map<number, TiledTilesetObject>,
         mapWidth: number,
-        mapHeight: number): VertexBufferGroup[] {
+        mapHeight: number,
+        vertexTypes: string[]): VertexBufferGroup[] {
 
         const chunkWidth = 512; // TODO parameter
         const chunkHeight = 512; // TODO parameter
@@ -217,8 +219,6 @@ export class TiledConverterService {
                 throw new ObjectNotFoundInDictionaryException(`Object with gid ${object.gid}" wasn't found in objectDictionary`);
             }
 
-            const vertexBufferGroup = undefined
-            /*
             const vertexBufferGroup: VertexBufferGroup = chunks[chunkY][chunkX] ? chunks[chunkY][chunkX] : {
                 chunkCoord: [ chunkX, chunkY ],
                 type: "vertex_buffer",
@@ -231,6 +231,7 @@ export class TiledConverterService {
 
             if (!vertexObject) {
                 vertexObject = {
+                    isFlat: object.type.includes("Flat"),
                     texture: objectTemplate.texture,
                     coords: [],
                 }
@@ -241,7 +242,6 @@ export class TiledConverterService {
             vertexObject.coords = [ ...vertexObject.coords, Math.round(object.x), Math.round(object.y) ];
             objectBuffer[vertexObjectIndex] = vertexObject;
             vertexBufferGroup.objectBuffer = objectBuffer;
-            */
             chunks[chunkY][chunkX] = vertexBufferGroup;
         })
 

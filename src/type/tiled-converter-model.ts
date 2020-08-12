@@ -178,6 +178,7 @@ export interface VertexBufferGroup {
 }
 
 export interface VertexObjectBuffer {
+    isFlat: boolean,
     texture: string,
     coords: number[]
 }

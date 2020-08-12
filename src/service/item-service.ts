@@ -93,6 +93,11 @@ export class ItemService {
             parsedParameters[requiredField.name] = this.parseToType(requiredField.type, parameters[requiredField.name]);
         });
 
+        const goldValue = parameters["goldValue"];
+        if (goldValue) {
+            parsedParameters["goldValue"] = goldValue;
+        }
+
         return parsedParameters as ItemParameter;
     }
 
