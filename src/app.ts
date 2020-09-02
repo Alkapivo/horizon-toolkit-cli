@@ -190,7 +190,13 @@ export class Application {
 					chestsJson.forEach(chest => this.logger.info(`Chest ${chest.chestId} parsed.`));
 					const chests = chestsJson
 
+					const groundDictionaryEntriesPath = path.posix
+						.normalize(yypPackage.meatSettings.groundDictionaryPath);
+					const groundDictionaryEntriesJson: any[] = JSON.parse(readFileSync(groundDictionaryEntriesPath).toString());
+					groundDictionaryEntriesJson.forEach(entry => this.logger.info(`Ground dictionary entry ${entry.name} parsed.`))
+					const groundDictionaryEntries = groundDictionaryEntriesJson;
 
+					
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
 	
@@ -199,7 +205,8 @@ export class Application {
 						mobPrototypes: mobs,
 						npcPrototypes: npcs,
 						chestPrototypes: chests,
-						dialogues: dialogues
+						dialogues: dialogues,
+						groundDictionaryEntries: groundDictionaryEntries
 					}
 
 					writeFileSync(
