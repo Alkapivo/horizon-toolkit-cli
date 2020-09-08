@@ -30,6 +30,7 @@ export interface MobStatistic {
     defence: number,
     accuracy: number,
     level: number,
+    moveSpeed: number,
 }
 
 export interface MobBehaviour {

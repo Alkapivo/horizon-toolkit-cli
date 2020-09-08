@@ -6,9 +6,46 @@ import { requiredItemFieldsDictionary, ItemTypeNotFoundException, ItemParseExcep
 import { assert } from 'console';
 import { FieldType } from '../type/game-content/game-content-model';
 
+
+
+
+
+
+
+
+
+
+class Dupa {
+
+    pierd(x: string) {
+        console.log("smrut", x);
+        x = x + "dupa";
+        console.log(x);
+    }
+}
+
+const dupa = new Dupa();
+dupa.pierd("wielki");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @injectable()
 export class ItemService {
-    
+
     private googleDriveService: GoogleSheetApiService;
     private excelService: ExcelService;
     private logger: log4js.Logger;
@@ -17,13 +54,13 @@ export class ItemService {
 
     constructor(
         @inject(GoogleSheetApiService) googleDriveService: GoogleSheetApiService,
-		@inject(ExcelService) excelService: ExcelService) {
+        @inject(ExcelService) excelService: ExcelService) {
 
         this.googleDriveService = googleDriveService;
         this.excelService = excelService;
 
         this.logger = log4js.getLogger();
-		this.logger.level = "debug";
+        this.logger.level = "debug";
     }
 
     public async buildItems(): Promise<Item[]> {
@@ -123,14 +160,14 @@ export class ItemService {
     }
 
     private getRequiredFieldsForType(type: string): FieldType[] {
-    
+
         const itemDictionary: ItemFieldsDictionary = requiredItemFieldsDictionary;
         const fields: FieldType[] = itemDictionary[type];
-    
+
         if (!fields) {
             throw new ItemTypeNotFoundException(`type ${type} wasn't found`);
         }
-    
+
         return fields;
     }
 }
