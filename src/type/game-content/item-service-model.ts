@@ -24,32 +24,79 @@ export interface Item {
 }
 
 export interface ItemParameter {
-    fighting?: number,
-    defence?: number,
-    accuracy?: number,
-    movementModifier?: MovementModifier,
-    damageEffects?: DamageEffect[],
+    damageStatistic: DamageStatistic,
+    resistanceStatistic: ResistanceStatistic,
+    damageEffects: DamageEffect[],
+    movementModifier: MovementModifier,
+    ammoType: String,
+    weaponType: String,
+    bookData: BookData,
+    doorId: String,
+    goldValue: Number,
+    hpRegenerationDuration: Number,
+    hpRegeneration: Number,
+    isQuestItem: Boolean,
+    rarity: Number
+}
 
-    ammoType?: string,
-    weaponType?: string,
-
-    bookContent?: string,
-    doorId?: string,
-    goldValue?: number,
-    hpRegenerationDuration?: number,
-    hpRegeneration?: number,
-    isQuestItem?: boolean,
-    specialType?: string,
+export interface DamageStatistic {
+    fighting: number,
+    defence: number,
+    accuracy: number,
+    intelligence: number
 }
 
 export interface DamageEffect {
-    name: string,
-    duration: number,
+    type: string,
+    probability: number,
+    value: number,
+    duration: number
 }
 
 export interface MovementModifier {
     ground?: string[],
+    groundExclude?: string[],
     value: number,
+}
+
+export interface ResistanceStatistic {
+    damageType?: ResistanceDamageType,
+    effect?: ResistanceEffect
+}
+
+export interface ResistanceDamageType {
+    physicialMele: number,
+    physicialDistance: number,
+    explosion: number,
+    telestarion: number
+}
+
+export interface ResistanceEffect {
+    physicialBleeding: number,
+    fireBleeding: number,
+    poisonBleeding: number,
+    telestarionBleeding: number,
+    slow: number,
+    critical: number,
+    lifeSteal: number
+}
+
+export interface BombStatistic {
+    damageFrom: number
+    damageTo: number
+    radius: number
+    range: number
+}
+
+export interface BookData {
+    bookContent?: string,
+    bookImage?: string,
+    setFacts?: string[],
+    isMap?: boolean
+}
+
+export interface ToolData {
+    type: string
 }
 
 export interface ItemFieldsDictionary {
@@ -63,8 +110,7 @@ export interface ItemFieldsDictionary {
     item_type_hat: FieldType[],
     item_type_key: FieldType[],
     item_type_other: FieldType[],
-    item_type_skill: FieldType[],
-    item_type_rope: FieldType[],
+    item_type_tool: FieldType[],
     item_type_shield: FieldType[],
     item_type_trousers: FieldType[],
     item_type_weapon: FieldType[],
@@ -73,24 +119,54 @@ export interface ItemFieldsDictionary {
 }
 
 export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
+    item_type_weapon: [
+        {
+            name: "weaponType",
+            type: "string",
+        },
+        {
+            name: "weaponRange",
+            type: "number",
+        },
+        {
+            name: "ammoType",
+            type: "string",
+        },
+        {
+            name: "damageStatistic",
+            type: "DamageStatistic",
+        },
+        {
+            name: "resistanceStatistic",
+            type: "ResistanceStatistic",
+        },
+        {
+            name: "damageEffects",
+            type: "DamageEffect[]",
+        },
+        {
+            name: "movementModifier",
+            type: "MovementModifier",
+        }
+    ],
     item_type_ammo: [
         {
             name: "ammoType",
             type: "string",
+        },
+        {
+            name: "damageEffects",
+            type: "DamageEffect[]",
         }
     ],
     item_type_armor: [
         {
-            name: "fighting",
-            type: "number",
+            name: "damageStatistic",
+            type: "DamageStatistic",
         },
         {
-            name: "defence",
-            type: "number",
-        },
-        {
-            name: "accuracy",
-            type: "number",
+            name: "resistanceStatistic",
+            type: "ResistanceStatistic",
         },
         {
             name: "movementModifier",
@@ -99,22 +175,18 @@ export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
     ],
     item_type_book: [
         {
-            name: "bookContent",
-            type: "string",
+            name: "bookData",
+            type: "BookData",
         }
     ],
     item_type_boots: [
         {
-            name: "fighting",
-            type: "number",
+            name: "damageStatistic",
+            type: "DamageStatistic",
         },
         {
-            name: "defence",
-            type: "number"
-        },
-        {
-            name: "accuracy",
-            type: "number",
+            name: "resistanceStatistic",
+            type: "ResistanceStatistic",
         },
         {
             name: "movementModifier",
@@ -140,16 +212,12 @@ export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
     ],
     item_type_hat: [
         {
-            name: "fighting",
-            type: "number",
+            name: "damageStatistic",
+            type: "DamageStatistic",
         },
         {
-            name: "defence",
-            type: "number",
-        },
-        {
-            name: "accuracy",
-            type: "number",
+            name: "resistanceStatistic",
+            type: "ResistanceStatistic",
         },
         {
             name: "movementModifier",
@@ -168,29 +236,20 @@ export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
             type: "boolean",
         }
     ],
-    item_type_skill: [
+    item_type_tool: [
         {
-            name: "skillName",
-            type: "string",
-        },
-        {
-            name: "skillCooldown",
-            type: "number",
+            name: "toolData",
+            type: "ToolData"
         }
     ],
-    item_type_rope: [],
     item_type_shield: [
         {
-            name: "fighting",
-            type: "number"
+            name: "damageStatistic",
+            type: "DamageStatistic",
         },
         {
-            name: "defence",
-            type: "number"
-        },
-        {
-            name: "accuracy",
-            type: "number",
+            name: "resistanceStatistic",
+            type: "ResistanceStatistic",
         },
         {
             name: "movementModifier",
@@ -199,61 +258,26 @@ export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
     ],
     item_type_trousers: [
         {
-            name: "fighting",
-            type: "number"
+            name: "damageStatistic",
+            type: "DamageStatistic",
         },
         {
-            name: "defence",
-            type: "number"
-        },
-        {
-            name: "accuracy",
-            type: "number"
+            name: "resistanceStatistic",
+            type: "ResistanceStatistic",
         },
         {
             name: "movementModifier",
             type: "MovementModifier",
         }
-    ],
-    item_type_weapon: [
-        {
-            name: "weaponType",
-            type: "string",
-        },
-        {
-            name: "fighting",
-            type: "number",
-        },
-        {
-            name: "defence",
-            type: "number",
-        },
-        {
-            name: "accuracy",
-            type: "number",
-        },
-        {
-            name: "movementModifier",
-            type: "MovementModifier",
-        },
-        {
-            name: "damageEffects",
-            type: "DamageEffect[]",
-        }
-
     ],
     item_type_ring: [
         {
-            name: "fighting",
-            type: "number",
+            name: "damageStatistic",
+            type: "DamageStatistic",
         },
         {
-            name: "defence",
-            type: "number",
-        },
-        {
-            name: "accuracy",
-            type: "number",
+            name: "resistanceStatistic",
+            type: "ResistanceStatistic",
         },
         {
             name: "movementModifier",
@@ -262,20 +286,8 @@ export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
     ],
     item_type_bomb: [
         {
-            name: "bombDistance",
-            type: "number",
-        },
-        {
-            name: "bombShape",
-            type: "number",
-        },
-        {
-            name: "bombSize",
-            type: "number",
-        },
-        {
-            name: "bombDamage",
-            type: "number",
+            name: "bombStatistic",
+            type: "BombStatistic",
         }
     ]
 }

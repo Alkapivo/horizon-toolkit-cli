@@ -2,46 +2,9 @@ import log4js from 'log4js';
 import { injectable, inject } from "inversify";
 import { GoogleSheetApiService } from "./google-drive-api-service";
 import { ExcelService } from "./excel-service";
-import { requiredItemFieldsDictionary, ItemTypeNotFoundException, ItemParseException, Item, ItemParameter, ItemFieldsDictionary, MovementModifier, DamageEffect } from "../type/game-content/item-service-model";
+import { requiredItemFieldsDictionary, ItemTypeNotFoundException, ItemParseException, Item, ItemParameter, DamageStatistic, DamageEffect, MovementModifier, ResistanceStatistic, ResistanceDamageType, ResistanceEffect, BombStatistic, BookData, ToolData, ItemFieldsDictionary } from "../type/game-content/item-service-model";
 import { assert } from 'console';
 import { FieldType } from '../type/game-content/game-content-model';
-
-
-
-
-
-
-
-
-
-
-class Dupa {
-
-    pierd(x: string) {
-        console.log("smrut", x);
-        x = x + "dupa";
-        console.log(x);
-    }
-}
-
-const dupa = new Dupa();
-dupa.pierd("wielki");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @injectable()
 export class ItemService {
@@ -92,7 +55,6 @@ export class ItemService {
                     columnIndex++;
                     const capacity = Number(row[6].replace(",", "."));
                     assert(capacity !== NaN && capacity, "capacity is NaN");
-                    console.log(capacity);
                     columnIndex++;
                     const parameters = this.parseItemParametersByType(type, JSON.parse(row[7]));
 
@@ -135,10 +97,16 @@ export class ItemService {
             parsedParameters["goldValue"] = goldValue;
         }
 
+        const rarity = parameters["goldValue"];
+        if (rarity) {
+            parsedParameters["rarity"] = rarity;
+        }
+
         return parsedParameters as ItemParameter;
     }
 
     private parseToType(fieldType: string, data: any): any {
+        ///DamageStatistic, DamageEffect, MovementModifier, ResistanceStatistic, ResistanceDamageType, ResistanceEffect, BombStatistic, BookData, ToolData
         switch (fieldType) {
             case "string":
                 return data as string;
@@ -149,11 +117,25 @@ export class ItemService {
                 }
                 return value;
             case "boolean":
-                return data as boolean;
+                return (data as boolean);
             case "MovementModifier":
                 return (data as MovementModifier);
             case "DamageEffect[]":
-                return data.map(entry => entry as DamageEffect);
+                return (data.map(entry => entry as DamageEffect));
+            case "DamageStatistic":
+                return (data as DamageStatistic);
+            case "ResistanceStatistic":
+                return (data as ResistanceStatistic);
+            case "ResistanceDamageType":
+                return (data as ResistanceDamageType);
+            case "ResistanceEffect":
+                return (data as ResistanceEffect);
+            case "BombStatistic":
+                return (data as BombStatistic);
+            case "BookData":
+                return (data as BookData);
+            case "ToolData":
+                return (data as ToolData);
             default:
                 throw new ItemParseException(`Field parser implementation for type "${fieldType}" wasn't found`);
         }

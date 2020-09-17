@@ -5,6 +5,7 @@ import { ExcelService } from "./excel-service";
 import { Mob, MobParseException, MobStatistic, MobBehaviour, Loot, MobBehaviourFieldsDictionary, requiredMobBehaviourFieldsDictionary, MobTypeNotFoundException } from "../type/game-content/mob-service-model";
 import { FieldType } from '../type/game-content/game-content-model';
 import { assert } from 'console';
+import { DamageStatistic, ResistanceStatistic, ResistanceDamageType, ResistanceEffect } from '../type/game-content/item-service-model';
 
 @injectable()
 export class MobService {
@@ -49,27 +50,23 @@ export class MobService {
                     columnIndex++;
                     const texture = row[3];
                     columnIndex++;
-                    const hp = Number(row[4].replace(",", "."));
-                    assert(hp !== NaN && hp, "hp is NaN");
-                    columnIndex++;
-                    const exp = Number(row[5].replace(",", "."));
+                    const exp = Number(row[4].replace(",", "."));
                     assert(exp !== NaN && exp, "exp is NaN");
                     columnIndex++;
-                    const statistic = (JSON.parse(row[6]) as MobStatistic);
+                    const statistic = (JSON.parse(row[5]) as MobStatistic);
                     columnIndex++;
-                    const behaviours = (JSON.parse(row[7]) as MobBehaviour[])
+                    const behaviours = (JSON.parse(row[6]) as MobBehaviour[])
                         .map(behaviour => this.parseMobBehaviour(behaviour));
                     columnIndex++;
-                    const loot = (JSON.parse(row[8]) as Loot[]);
+                    const loot = (JSON.parse(row[7]) as Loot[]);
                     columnIndex++;
-                    const eq = (JSON.parse(row[9]) as number[]);
+                    const eq = (JSON.parse(row[8]) as number[]);
 
                     const mob: Mob = {
                         mobId: id,
                         name: name,
                         type: type,
                         texture: texture,
-                        hp: hp,
                         experience: exp,
                         statistic: statistic,
                         behaviours: behaviours,
@@ -135,6 +132,14 @@ export class MobService {
                 return value;
             case "boolean":
                 return data as boolean;
+            case "DamageStatistic":
+                return (data as DamageStatistic);
+            case "ResistanceStatistic":
+                return (data as ResistanceStatistic);
+            case "ResistanceDamageType":
+                return (data as ResistanceDamageType);
+            case "ResistanceEffect":
+                return (data as ResistanceEffect);
             default:
                 throw new MobParseException(`Field parser implementation for type "${fieldType}" wasn't found`);
         }

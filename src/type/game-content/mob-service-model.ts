@@ -1,4 +1,5 @@
 import { FieldType } from "./game-content-model";
+import { DamageStatistic, ResistanceStatistic } from "./item-service-model";
 
 export class MobTypeNotFoundException extends Error {
     constructor(message: string) {
@@ -17,7 +18,6 @@ export interface Mob {
     name: string,
     type: string,
     texture: string,
-    hp: number,
     experience: number,
     statistic: MobStatistic,
     behaviours: MobBehaviour[],
@@ -26,11 +26,13 @@ export interface Mob {
 }
 
 export interface MobStatistic {
-    fighting: number,
-    defence: number,
-    accuracy: number,
     level: number,
-    moveSpeed: number,
+    healthPoints: number,
+    damageStatistic?: DamageStatistic,
+    resistance?: ResistanceStatistic,
+    telestarionPoints?: number,
+    capacity?: number,
+    movementSpeed: number
 }
 
 export interface MobBehaviour {
