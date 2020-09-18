@@ -95,6 +95,8 @@ export interface BookData {
     isMap?: boolean
 }
 
+const asd: BookData = {}
+
 export interface ToolData {
     type: string
 }
