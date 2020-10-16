@@ -13,31 +13,70 @@ export class MobParseException extends Error {
     }
 }
 
-export interface Mob {
+export interface MobPrototype {
     mobId: string,
     name: string,
     type: string,
     texture: string,
     experience: number,
-    statistic: MobStatistic,
-    behaviours: MobBehaviour[],
+    statistic: MobStatisticPrototype,
+    behaviourGroup: MobBehaviourGroup,
     loot: Loot[],
-    eq: number[],
+    eq: string[],
 }
 
-export interface MobStatistic {
+export interface MobStatisticPrototype {
     level: number,
     healthPoints: number,
-    damageStatistic?: DamageStatistic,
-    resistance?: ResistanceStatistic,
-    telestarionPoints?: number,
-    capacity?: number,
-    movementSpeed: number
+    movementSpeed: number,
+    scanner: Scanner,
+    damageStatistic: MobDamageStatistic,
+    resistance: MobResistance,
+}
+
+export interface Scanner {
+    mobRange: number,
+    mobCloseRange: number,
+    mobViewAngleRange: number
+}
+
+export interface MobDamageStatistic {
+    fighting: number,
+    defence: number,
+    accuracy: number,
+    Intelligence: number
+}
+
+export interface MobResistance {
+    damageType: MobTypeResistance,
+    effect: MobEffectResistance
+}
+
+export interface MobTypeResistance {
+    physicialMele: number,
+    physicialDistance: number,
+    explosion: number,
+    telestarion: number
+}
+
+export interface MobEffectResistance {
+    physicialBleeding: number,
+    fireBleeding: number,
+    poisonBleeding: number,
+    telestarionBleeding: number,
+    slow: number,
+    critical: number,
+    lifeSteal: number
+},
+
+export interface MobBehaviourGroup {
+    idle: MobBehaviour[],
+    action: MobBehaviour[]
 }
 
 export interface MobBehaviour {
     name: string,
-    parameters?: {}
+    parameters: {}
 }
 
 export interface Loot {
@@ -45,49 +84,4 @@ export interface Loot {
     probability: number,
     amountFrom: number,
     amountTo: number,
-}
-
-export interface MobBehaviourFieldsDictionary {
-    attack_on_hit: FieldType[],
-    always_attack: FieldType[],
-    attack_mele: FieldType[],
-    attack_distance: FieldType[],
-    runaway: FieldType[],
-}
-
-export const requiredMobBehaviourFieldsDictionary: MobBehaviourFieldsDictionary = {
-    attack_on_hit: [],
-    always_attack: [
-        {
-            name: "followRange",
-            type: "number",
-        }
-    ],
-    attack_mele: [
-        {
-            name: "followRange",
-            type: "number",
-        }
-    ],
-    attack_distance: [
-        {
-            name: "followRange",
-            type: "number",
-        },
-        {
-            name: "keepDistance",
-            type: "number",
-        },
-        {
-            name: "useBellowHP",
-            type: "number",
-            isRequired: false,
-        }
-    ],
-    runaway: [
-        {
-            name: "runAwayAtHp",
-            type: "number",
-        }
-    ],
 }

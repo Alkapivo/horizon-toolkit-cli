@@ -1,5 +1,5 @@
 import { Item } from "./item-service-model";
-import { Mob } from "./mob-service-model";
+import { MobPrototype } from "./mob-service-model";
 import { NPC } from "./npc-service-model";
 
 export interface FieldType {
@@ -10,7 +10,7 @@ export interface FieldType {
 
 export interface MeatPackage {
     items: Item[],
-    mobs: Mob[],
+    mobs: MobPrototype[],
     npcs: NPC[],
 }
 

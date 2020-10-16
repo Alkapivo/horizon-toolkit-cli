@@ -2,7 +2,7 @@ import log4js from 'log4js';
 import { injectable, inject } from "inversify";
 import { GoogleSheetApiService } from "./google-drive-api-service";
 import { ExcelService } from "./excel-service";
-import { Mob, MobParseException, MobStatistic, MobBehaviour, Loot, MobBehaviourFieldsDictionary, requiredMobBehaviourFieldsDictionary, MobTypeNotFoundException } from "../type/game-content/mob-service-model";
+import { Mob, MobParseException, MobStatisticPrototype, MobBehaviour, Loot, MobBehaviourFieldsDictionary, requiredMobBehaviourFieldsDictionary, MobTypeNotFoundException, MobBehaviourGroup } from "../type/game-content/mob-service-model";
 import { FieldType } from '../type/game-content/game-content-model';
 import { assert } from 'console';
 import { DamageStatistic, ResistanceStatistic, ResistanceDamageType, ResistanceEffect } from '../type/game-content/item-service-model';
@@ -51,16 +51,14 @@ export class MobService {
                     const texture = row[3];
                     columnIndex++;
                     const exp = Number(row[4].replace(",", "."));
-                    assert(exp !== NaN && exp, "exp is NaN");
                     columnIndex++;
-                    const statistic = (JSON.parse(row[5]) as MobStatistic);
+                    const statistic = (JSON.parse(row[5]) as MobStatisticPrototype);
                     columnIndex++;
-                    const behaviours = (JSON.parse(row[6]) as MobBehaviour[])
-                        .map(behaviour => this.parseMobBehaviour(behaviour));
+                    const behaviourGroup = (JSON.parse(row[6]) as MobBehaviourGroup);
                     columnIndex++;
                     const loot = (JSON.parse(row[7]) as Loot[]);
                     columnIndex++;
-                    const eq = (JSON.parse(row[8]) as number[]);
+                    const eq = (JSON.parse(row[8]) as string[]);
 
                     const mob: Mob = {
                         mobId: id,
@@ -69,7 +67,7 @@ export class MobService {
                         texture: texture,
                         experience: exp,
                         statistic: statistic,
-                        behaviours: behaviours,
+                        behaviourGroup: behaviourGroup,
                         loot: loot,
                         eq: eq,
                     }
@@ -84,40 +82,6 @@ export class MobService {
             .filter(mob => mob);
 
         return mobs;
-    }
-
-    private parseMobBehaviour(behaviour): MobBehaviour {
-
-        const requiredFields = this.getRequiredFieldsForBehaviour(behaviour);
-
-        let parsedParameters = {};
-        requiredFields.forEach(requiredField => {
-            if (requiredField.isRequired && !Object.keys(behaviour.parameters).includes(requiredField.name)) {
-                throw new MobParseException(`Field ${requiredField.name} is required`);
-            }
-
-            if (!requiredField.isRequired) {
-                const value = behaviour.parameters[requiredField.name];
-                if (value) {
-                    parsedParameters[requiredField.name] = this.parseToType(requiredField.type, value);
-                }
-            } else {
-                parsedParameters[requiredField.name] = this.parseToType(requiredField.type,
-                    behaviour.parameters[requiredField.name]);
-            }
-        });
-
-        const mobBehaviour: MobBehaviour =
-            Object.keys(parsedParameters).length > 0 ?
-                {
-                    name: behaviour.name,
-                    parameters: parsedParameters,
-                } :
-                {
-                    name: behaviour.name,
-                }
-
-        return mobBehaviour as MobBehaviour;
     }
 
     private parseToType(fieldType: string, data: any): any {
@@ -143,17 +107,5 @@ export class MobService {
             default:
                 throw new MobParseException(`Field parser implementation for type "${fieldType}" wasn't found`);
         }
-    }
-
-    private getRequiredFieldsForBehaviour(behaviour): FieldType[] {
-
-        const behaviourDictionary: MobBehaviourFieldsDictionary = requiredMobBehaviourFieldsDictionary;
-        const fields: FieldType[] = behaviourDictionary[behaviour.name];
-
-        if (!fields) {
-            throw new MobTypeNotFoundException(`type ${behaviour.name} wasn't found`);
-        }
-
-        return fields;
     }
 }
