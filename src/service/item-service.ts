@@ -49,12 +49,16 @@ export class ItemService {
                     columnIndex++;
                     const texture = row[3];
                     columnIndex++;
+
+                    if (texture.includes("@")) {
+                        return undefined;
+                    }
+
                     const isStackable = (row[4] as string).toLowerCase() === "true";
                     columnIndex++;
                     const description = row[5];
                     columnIndex++;
                     const capacity = Number(row[6].replace(",", "."));
-                    assert(capacity !== NaN && capacity, "capacity is NaN");
                     columnIndex++;
                     const parameters = this.parseItemParametersByType(type, JSON.parse(row[7]));
 
@@ -106,7 +110,6 @@ export class ItemService {
     }
 
     private parseToType(fieldType: string, data: any): any {
-        ///DamageStatistic, DamageEffect, MovementModifier, ResistanceStatistic, ResistanceDamageType, ResistanceEffect, BombStatistic, BookData, ToolData
         switch (fieldType) {
             case "string":
                 return data as string;

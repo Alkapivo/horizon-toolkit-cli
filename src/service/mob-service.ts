@@ -2,7 +2,7 @@ import log4js from 'log4js';
 import { injectable, inject } from "inversify";
 import { GoogleSheetApiService } from "./google-drive-api-service";
 import { ExcelService } from "./excel-service";
-import { Mob, MobParseException, MobStatisticPrototype, MobBehaviour, Loot, MobBehaviourFieldsDictionary, requiredMobBehaviourFieldsDictionary, MobTypeNotFoundException, MobBehaviourGroup } from "../type/game-content/mob-service-model";
+import { MobPrototype, MobParseException, MobStatisticPrototype, MobBehaviour, Loot, MobTypeNotFoundException, MobBehaviourGroup } from "../type/game-content/mob-service-model";
 import { FieldType } from '../type/game-content/game-content-model';
 import { assert } from 'console';
 import { DamageStatistic, ResistanceStatistic, ResistanceDamageType, ResistanceEffect } from '../type/game-content/item-service-model';
@@ -27,14 +27,14 @@ export class MobService {
         this.logger.level = "debug";
     }
 
-    public async buildMobs(): Promise<Mob[]> {
+    public async buildMobs(): Promise<MobPrototype[]> {
         const googleDriveRows = await this.googleDriveService.getSheet({
             sheetId: this.mobSpreadsheetId,
             sheetName: "mob_data",
             credentialsPath: "secret/credentials.json",
         });
 
-        const mobs: Mob[] = googleDriveRows.rows
+        const mobs: MobPrototype[] = googleDriveRows.rows
             .map((row, index) => {
                 if (index === 0) {
                     return undefined;
@@ -60,14 +60,14 @@ export class MobService {
                     columnIndex++;
                     const eq = (JSON.parse(row[8]) as string[]);
 
-                    const mob: Mob = {
+                    const mob: MobPrototype = {
                         mobId: id,
                         name: name,
                         type: type,
                         texture: texture,
                         experience: exp,
                         statistic: statistic,
-                        behaviourGroup: behaviourGroup,
+                        behaviours: behaviourGroup,
                         loot: loot,
                         eq: eq,
                     }

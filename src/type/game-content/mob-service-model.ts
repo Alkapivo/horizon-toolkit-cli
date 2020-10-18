@@ -20,7 +20,7 @@ export interface MobPrototype {
     texture: string,
     experience: number,
     statistic: MobStatisticPrototype,
-    behaviourGroup: MobBehaviourGroup,
+    behaviours: MobBehaviourGroup,
     loot: Loot[],
     eq: string[],
 }
@@ -67,7 +67,7 @@ export interface MobEffectResistance {
     slow: number,
     critical: number,
     lifeSteal: number
-},
+}
 
 export interface MobBehaviourGroup {
     idle: MobBehaviour[],

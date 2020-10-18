@@ -196,11 +196,18 @@ export class Application {
 					groundDictionaryEntriesJson.forEach(entry => this.logger.info(`Ground dictionary entry ${entry.name} parsed.`))
 					const groundDictionaryEntries = groundDictionaryEntriesJson;
 
-					
+					const textureStripDictionaryPath = path.posix
+						.normalize(yypPackage.meatSettings.textureStripDictionaryPath);
+					const textureStripDictionaryJson: any[] = JSON.parse(readFileSync(textureStripDictionaryPath).toString());
+					textureStripDictionaryJson.forEach(entry => this.logger.info(`TextureStrip entry ${entry.name} parsed.`))
+					const textureStrips = textureStripDictionaryJson;
+
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
 	
 					const meatPackage = {
+						textureStrips: textureStrips,
+						questPrototypes: [],
 						itemPrototypes: items,
 						mobPrototypes: mobs,
 						npcPrototypes: npcs,

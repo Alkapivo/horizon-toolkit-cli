@@ -20,6 +20,7 @@ export interface YYPPackage {
         dialoguePath: string,
         chestsPath: string,
         groundDictionaryPath: string
+        textureStripDictionaryPath: string
     }
 }
 

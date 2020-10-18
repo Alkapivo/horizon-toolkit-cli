@@ -37,6 +37,7 @@ export interface ItemParameter {
     hpRegeneration: Number,
     isQuestItem: Boolean,
     rarity: Number
+    toolData: ToolData
 }
 
 export interface DamageStatistic {
@@ -97,6 +98,7 @@ export interface BookData {
 
 export interface ToolData {
     type: string
+    parameters: any
 }
 
 export interface ItemFieldsDictionary {
