@@ -202,6 +202,12 @@ export class Application {
 					textureStripDictionaryJson.forEach(entry => this.logger.info(`TextureStrip entry ${entry.name} parsed.`))
 					const textureStrips = textureStripDictionaryJson;
 
+					const skillPrototypesPath = path.posix
+						.normalize(yypPackage.meatSettings.skillPrototypesPath);
+					const skillPrototypesJson: any[] = JSON.parse(readFileSync(skillPrototypesPath).toString());
+					skillPrototypesJson.forEach(entry => this.logger.info(`SkillPrototype entry ${entry.name} parsed.`))
+					const skillPrototypes = skillPrototypesJson;
+
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
 	
@@ -213,7 +219,8 @@ export class Application {
 						npcPrototypes: npcs,
 						chestPrototypes: chests,
 						dialogues: dialogues,
-						groundDictionaryEntries: groundDictionaryEntries
+						groundDictionaryEntries: groundDictionaryEntries,
+						skillPrototypes: skillPrototypes
 					}
 
 					writeFileSync(

@@ -141,7 +141,8 @@ export class TiledConverterService {
             yPos: jsonTiledLayer.y,
             objects: jsonTiledLayer.objects
                 .filter((object: JsonTiledObject) => !vertexTypes.includes(object.type))
-                .map((object: JsonTiledObject) => this.convertJsonTiledObjectToTiledObject(object, objectDictionary)),
+                .map((object: JsonTiledObject) => this.convertJsonTiledObjectToTiledObject(object, objectDictionary))
+                .filter(object => object),
         };
 
         const vertexBufferGroups = this.convertJsonTiledObjectsToVertexBufferGroups(
@@ -167,7 +168,9 @@ export class TiledConverterService {
 
         const objectTemplate = objectDictionary.get(object.gid);
         if (!objectTemplate) {
-            throw new ObjectNotFoundInDictionaryException(`Object with gid ${object.gid} wasn't found in objectDictionary. Data: ${JSON.stringify(object)}`);
+            //throw new ObjectNotFoundInDictionaryException(`Object with gid ${object.gid} wasn't found in objectDictionary. Data: ${JSON.stringify(object)}`);
+            this.logger.log(`Object with gid ${object.gid} wasn't found in objectDictionary. Data: ${JSON.stringify(object)}`);
+            return undefined;
         }
 
         const parsedObject: TiledObject = {
