@@ -118,6 +118,7 @@ export interface ItemFieldsDictionary {
     item_type_weapon: FieldType[],
     item_type_ring: FieldType[],
     item_type_bomb: FieldType[],
+    item_type_talisman: FieldType[]
 }
 
 export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
@@ -291,7 +292,8 @@ export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
             name: "bombStatistic",
             type: "BombStatistic",
         }
-    ]
+    ],
+    item_type_talisman: []
 }
 
 
