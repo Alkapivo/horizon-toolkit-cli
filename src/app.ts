@@ -65,10 +65,10 @@ export class Application {
 			.description("CLI Toolkit. Run in root folder of horizon-engine project.");
 
 		program
-			.command("map <map_name>")
+			.command("map <map_name> [types...]")
 			.alias("mm")
 			.description("Compile exported map to .mm format")
-			.action((mapName: string) => {
+			.action((mapName: string, types) => {
 				this.logger.info(`Start building map ${mapName}`);
 
 				const yypPackage = this.getYYPPackage();
@@ -83,7 +83,7 @@ export class Application {
 				const tiledJson: string = readFileSync(`${exportedMapDirectoryPath}/${mapName}.json`)
 					.toString();
 				const tiledMap: TiledMap = this.tiledConverterService
-					.convertTiledJsonToTiledMap(mapName, tiledJson);
+					.convertTiledJsonToTiledMap(mapName, tiledJson, types);
 
 				writeFileSync(
 					`${convertedMapDirectoryPath}/${mapName}.mm`,

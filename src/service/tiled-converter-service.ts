@@ -9,6 +9,8 @@ import { POINT_CONVERSION_UNCOMPRESSED } from 'constants';
 export class TiledConverterService {
 
     public readonly name: string = "TiledConverterService";
+
+    public logTiledObjects: string[] = []
     private logger: log4js.Logger;
 
     constructor() {
@@ -18,7 +20,9 @@ export class TiledConverterService {
     /**
      * @throws {JsonTiledParseException}
     */
-    public convertTiledJsonToTiledMap(name: string, tiledJson: string): TiledMap {
+    public convertTiledJsonToTiledMap(name: string, tiledJson: string, logTiledObjects: string[] = []): TiledMap {
+
+        this.logTiledObjects = logTiledObjects;
 
         const jsonTiledMap = JSON.parse(tiledJson) as JsonTiledMap;
 
@@ -190,6 +194,17 @@ export class TiledConverterService {
                 propertiesObject[property.name] = property.value;
             });
             parsedObject.properties = propertiesObject;
+        }
+
+        
+        const matchTiledObjectType = this.logTiledObjects.find(type => type === parsedObject.type);
+       // console.log("=>", matchTiledObjectType, "|", this.logTiledObjects)
+       // this.logger.log("matchTiledObjectType: ", matchTiledObjectType);
+        if (matchTiledObjectType) {
+
+            const message = `{ type: "${parsedObject.type}", texture: "${parsedObject.texture}" realPosition: { x: ${parsedObject.xPos} y: ${parsedObject.yPos} }, coordPosition: { x: ${parsedObject.xPos % 32} y: ${parsedObject.xPos % 32} }, properties: ${parsedObject.properties ? JSON.stringify(parsedObject.properties) : "{}"} }`;
+            //this.logger.log(message);
+            console.log("=>", message)
         }
 
         return parsedObject;
