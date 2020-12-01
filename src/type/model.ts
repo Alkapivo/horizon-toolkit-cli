@@ -22,6 +22,7 @@ export interface YYPPackage {
         groundDictionaryPath: string
         textureStripDictionaryPath: string
         skillPrototypesPath: string
+        questPrototypesPath: string
     }
 }
 

@@ -92,48 +92,6 @@ export class Application {
 			})
 
 		program
-			.command("package")
-			.alias("pkg")
-			.description("Create resourcePackage")
-			.action(async () => {
-				const yypPackage = this.getYYPPackage();
-			});
-
-		program
-			.command("dialogues")
-			.alias("d")
-			.description("Build dialogues")
-			.action(() => {
-				const yypPackage = this.getYYPPackage();
-
-				const dialogueModelPath = path.posix
-						.normalize(yypPackage.meatSettings.dialoguePath);
-					const dialoguePaths: any[] = JSON.parse(readFileSync(dialogueModelPath + "/model.json").toString())
-						.map(entry => {
-							return {
-								name: entry.name,
-								dialogue: JSON.parse(readFileSync(
-									path.posix
-										.normalize(dialogueModelPath + "/" + entry.path)
-									).toString()
-								),
-							}
-					});
-
-				const dialogues = dialoguePaths
-					.map(entry => this.dialogueService.buildDialogue(entry.name, entry.dialogue))
-				
-				const dialoguesPackage = {
-					dialogues: dialogues
-				}
-				
-				writeFileSync(path.posix
-					.normalize(yypPackage.meatSettings.mpkgPath + "/dialogues.json"), 
-						JSON.stringify(dialoguesPackage, null, "\t")
-				);
-			});
-
-		program
 			.command("test [type]")
 			.alias("tst")
 			.description("Run YYPTestEngine on project")
@@ -142,7 +100,7 @@ export class Application {
 			});
 
 		program
-			.command("entity [classses...]")
+			.command("entity")
 			.alias("e")
 			.description("Generate entity code and inject it to yyp project. All entites will be build if you don't pass any [classes...]")
 			.action((classes) => {
@@ -156,9 +114,9 @@ export class Application {
 			})
 
 		program
-			.command("meat-builder [options...]")
+			.command("meat-package-builder [options...]")
 			.alias("mpkg")
-			.description("@Meat: Compiler for: [ npc, mob, item, dialogue ]")
+			.description("@Meat: Compile meat-asset into meat_package.")
 			.action(async (options?) => {
 				const yypPackage = this.getYYPPackage();
 
@@ -166,7 +124,6 @@ export class Application {
 					const items = await this.itemService.buildItems();
 					const mobs = await this.mobService.buildMobs();
 					const npcs = await this.npcService.buildNPCs();
-
 
 					const dialogueModelPath = path.posix
 						.normalize(yypPackage.meatSettings.dialoguePath);
@@ -208,19 +165,25 @@ export class Application {
 					skillPrototypesJson.forEach(entry => this.logger.info(`SkillPrototype entry ${entry.name} parsed.`))
 					const skillPrototypes = skillPrototypesJson;
 
+					var questPrototypesPath = path.posix
+						.normalize(yypPackage.meatSettings.questPrototypesPath);
+					const questPrototypesJson: any[] = JSON.parse(readFileSync(questPrototypesPath).toString());
+						questPrototypesJson.forEach(entry => this.logger.info(`QuestPrototype entry ${entry.name} parsed.`))
+					const questPrototypes = questPrototypesJson;
+
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
 	
 					const meatPackage = {
 						textureStrips: textureStrips,
-						questPrototypes: [],
 						itemPrototypes: items,
 						mobPrototypes: mobs,
 						npcPrototypes: npcs,
 						chestPrototypes: chests,
 						dialogues: dialogues,
 						groundDictionaryEntries: groundDictionaryEntries,
-						skillPrototypes: skillPrototypes
+						skillPrototypes: skillPrototypes,
+						questPrototypes:  questPrototypes
 					}
 
 					writeFileSync(
@@ -231,8 +194,7 @@ export class Application {
 					console.error(exception);
 				}
 			});
-
-		this.logger.debug(`Parsing arguments: ${process.argv.toString().split(",").filter(arg => !(arg.includes("node.exe") || arg.includes("app.js"))).join(" ")}`)
+		
 		program.parse(process.argv);
 	}
 
@@ -310,7 +272,3 @@ export class Application {
 
 const application: Application = DIContanier.resolve<Application>(Application);
 application.run();
-
-
-
-

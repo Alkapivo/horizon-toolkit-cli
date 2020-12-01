@@ -101,7 +101,7 @@ export class ItemService {
             parsedParameters["goldValue"] = goldValue;
         }
 
-        const rarity = parameters["goldValue"];
+        const rarity = parameters["rarity"];
         if (rarity) {
             parsedParameters["rarity"] = rarity;
         }

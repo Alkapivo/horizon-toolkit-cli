@@ -109,6 +109,7 @@ export interface ItemFieldsDictionary {
     item_type_container: FieldType[],
     item_type_currency: FieldType[],
     item_type_food: FieldType[],
+    item_type_potion: FieldType[],
     item_type_hat: FieldType[],
     item_type_key: FieldType[],
     item_type_other: FieldType[],
@@ -204,6 +205,16 @@ export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
         }
     ],
     item_type_food: [
+        {
+            name: "hpRegeneration",
+            type: "number",
+        },
+        {
+            name: "hpRegenerationDuration",
+            type: "number",
+        }
+    ],
+    item_type_potion: [
         {
             name: "hpRegeneration",
             type: "number",
