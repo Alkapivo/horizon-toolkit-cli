@@ -169,7 +169,15 @@ export class Application {
 						.normalize(yypPackage.meatSettings.questPrototypesPath);
 					const questPrototypesJson: any[] = JSON.parse(readFileSync(questPrototypesPath).toString());
 						questPrototypesJson.forEach(entry => this.logger.info(`QuestPrototype entry ${entry.name} parsed.`))
-					const questPrototypes = questPrototypesJson;
+					const questPrototypes = questPrototypesJson
+						.map(questPrototype => { 
+							return {
+								name: questPrototype.name,
+								displayName: questPrototype.displayName,
+								log: null,
+								schema: JSON.stringify(questPrototype.schema),
+							}
+						});
 
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);

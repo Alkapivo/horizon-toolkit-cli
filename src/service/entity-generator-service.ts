@@ -556,6 +556,7 @@ export class EntityGeneratorService {
 		}
 		
 		functionBody += `\n\tvar ${entityObjectName}JsonString = encodeJson(jsonObject);\n`;
+		functionBody += `\tdestroyJsonObject(jsonObject);\n`;
 		const returnStatement = `\n\treturn ${entityObjectName}JsonString;\n\t\n`;
 
 		return functionDescription + functionBody + returnStatement;
