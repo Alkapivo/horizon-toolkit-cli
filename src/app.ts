@@ -127,19 +127,27 @@ export class Application {
 
 					const dialogueModelPath = path.posix
 						.normalize(yypPackage.meatSettings.dialoguePath);
-					const dialoguePaths: any[] = JSON.parse(readFileSync(dialogueModelPath + "/model.json").toString())
+					const dialoguePrototypes: any[] = JSON.parse(readFileSync(dialogueModelPath + "/model.json").toString())
 						.map(entry => {
-							return {
+							const dialoguePrototypeEntry = {
 								name: entry.name,
-								dialogue: JSON.parse(readFileSync(
-									path.posix
-										.normalize(dialogueModelPath + "/" + entry.path)
-									).toString()
-								),
+								dialogues: Object
+									.keys(entry.path)
+									.map(langCode => {
+										const dialogueLangPackPath = path.posix
+											.normalize(dialogueModelPath + "/" + entry.path[langCode])
+										const dialogue = JSON
+											.parse(readFileSync(dialogueLangPackPath)
+											.toString()
+										)
+										
+										return this.dialogueService.buildDialogue(entry.name, dialogue)
+									})
 							}
+
+							//this.logger.info(`DialoguePrototype ${dialoguePrototypeEntry.name} parsed.`)
+							return dialoguePrototypeEntry;
 					});
-					const dialogues = dialoguePaths
-						.map(entry => this.dialogueService.buildDialogue(entry.name, entry.dialogue))
 
 					const chestModelPath = path.posix
 						.normalize(yypPackage.meatSettings.chestsPath);
@@ -222,7 +230,7 @@ export class Application {
 						mobPrototypes: mobs,
 						npcPrototypes: npcs,
 						chestPrototypes: chests,
-						dialogues: dialogues,
+						dialoguePrototypes: dialoguePrototypes,
 						groundDictionaryEntries: groundDictionaryEntries,
 						skillPrototypes: skillPrototypes,
 						questPrototypes:  questPrototypes,
