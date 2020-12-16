@@ -165,10 +165,10 @@ export class Application {
 					skillPrototypesJson.forEach(entry => this.logger.info(`SkillPrototype entry ${entry.name} parsed.`))
 					const skillPrototypes = skillPrototypesJson;
 
-					var questPrototypesPath = path.posix
+					const questPrototypesPath = path.posix
 						.normalize(yypPackage.meatSettings.questPrototypesPath);
 					const questPrototypesJson: any[] = JSON.parse(readFileSync(questPrototypesPath).toString());
-						questPrototypesJson.forEach(entry => this.logger.info(`QuestPrototype entry ${entry.name} parsed.`))
+					questPrototypesJson.forEach(entry => this.logger.info(`QuestPrototype entry ${entry.name} parsed.`))
 					const questPrototypes = questPrototypesJson
 						.map(questPrototype => { 
 							return {
@@ -178,7 +178,41 @@ export class Application {
 								schema: JSON.stringify(questPrototype.schema),
 							}
 						});
+					
+					
+					const labelDictionaryPath = path.posix
+						.normalize(yypPackage.meatSettings.labelDictionaryPath);
+					const labelDictionaryJson: any[] = JSON.parse(readFileSync(labelDictionaryPath).toString());
+					const labelsPackages = [
+						{
+							langCode: "en_EN",
+							dictionary: {}
+						},
+						{
+							langCode: "pl_PL",
+							dictionary: {}
+						}
+					];
+					labelDictionaryJson
+						.forEach(labelsPackage => {
 
+							const langCode = labelsPackage.langCode;
+							const packageName = labelsPackage.packageName;
+							const dictionary = labelsPackage.dictionary;
+							const finalDictionary = labelsPackages.find(labelPackage => labelPackage.langCode === langCode);
+							if (dictionary) {
+
+								Object.keys(dictionary).forEach(key => finalDictionary.dictionary[key] = dictionary[key]);
+
+								this.logger.info(`LabelsPackage ${packageName} for langCode ${langCode} parsed.`);
+							} else {
+								
+								throw new Error("");
+							}
+						});
+					
+					
+					
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
 	
@@ -191,7 +225,8 @@ export class Application {
 						dialogues: dialogues,
 						groundDictionaryEntries: groundDictionaryEntries,
 						skillPrototypes: skillPrototypes,
-						questPrototypes:  questPrototypes
+						questPrototypes:  questPrototypes,
+						labelPackages: labelsPackages
 					}
 
 					writeFileSync(

@@ -19,10 +19,11 @@ export interface YYPPackage {
         mpkgPath: string,
         dialoguePath: string,
         chestsPath: string,
-        groundDictionaryPath: string
-        textureStripDictionaryPath: string
-        skillPrototypesPath: string
-        questPrototypesPath: string
+        groundDictionaryPath: string,
+        textureStripDictionaryPath: string,
+        skillPrototypesPath: string,
+        questPrototypesPath: string,
+        labelDictionaryPath: string, 
     }
 }
 
