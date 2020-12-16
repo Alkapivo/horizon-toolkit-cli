@@ -131,7 +131,7 @@ export class Application {
 						.map(entry => {
 							const dialoguePrototypeEntry = {
 								name: entry.name,
-								dialogues: Object
+								dialoguesLangPack: Object
 									.keys(entry.path)
 									.map(langCode => {
 										const dialogueLangPackPath = path.posix
@@ -141,8 +141,15 @@ export class Application {
 											.toString()
 										)
 										
-										return this.dialogueService.buildDialogue(entry.name, dialogue)
+										return {
+											key: langCode,
+											value: this.dialogueService.buildDialogue(entry.name, dialogue)
+										}
 									})
+									.reduce((_map, _obj) => {
+										_map[_obj.key] = _obj.value
+										return _map;
+									}, {})
 							}
 
 							//this.logger.info(`DialoguePrototype ${dialoguePrototypeEntry.name} parsed.`)
