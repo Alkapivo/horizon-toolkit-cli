@@ -12,7 +12,7 @@ export class DialogueService {
         this.logger.level = "debug";
     }
 
-    buildDialogue(name, designerDialogue) {
+    buildDialogue(name, designerDialogue, langCode = "en_EN") {
 
         const nodes = designerDialogue[0].nodes as any[];
 
@@ -31,12 +31,12 @@ export class DialogueService {
                 const nodeName: string = node.node_name;
                 const author: string = node.character ? node.character[0] : undefined;
                 const nextNode: string = node.next;
-                const text: string = (typeof node.text === 'string' || node.text instanceof String) ? undefined : node.text[Object.keys(node.text)[0]];
+                const text: string = (typeof node.text === 'string' || node.text instanceof String) ? undefined : node.text[langCode];
                 const action: string = (typeof node.text === 'string' || node.text instanceof String) ? node.text : undefined;
                 const choices: DialogueChoice[] = Array.isArray(node.choices) ? (
                     node.choices.map(choice => {
                         const nextNode: string = choice.next;
-                        const text: string = choice.text[Object.keys(node.text)[0]];
+                        const text: string = choice.text[langCode];
                         const conditionData: string = choice.is_condition ?
                             choice.condition : undefined;
 

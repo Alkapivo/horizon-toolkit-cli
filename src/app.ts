@@ -143,7 +143,7 @@ export class Application {
 										
 										return {
 											key: langCode,
-											value: this.dialogueService.buildDialogue(entry.name, dialogue)
+											value: this.dialogueService.buildDialogue(entry.name, dialogue, langCode)
 										}
 									})
 									.reduce((_map, _obj) => {
