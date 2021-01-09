@@ -2,7 +2,7 @@ import log4js from 'log4js';
 import { injectable, inject } from "inversify";
 import { GoogleSheetApiService } from "./google-drive-api-service";
 import { ExcelService } from "./excel-service";
-import { MobPrototype, MobParseException, MobStatisticPrototype, MobBehaviour, Loot, MobTypeNotFoundException, MobBehaviourGroup } from "../type/game-content/mob-service-model";
+import { MobPrototype, MobParseException, MobStatisticPrototype, MobBehaviour, Loot, MobTypeNotFoundException, MobBehaviourGroup, MobType } from "../type/game-content/mob-service-model";
 import { FieldType } from '../type/game-content/game-content-model';
 import { assert } from 'console';
 import { DamageStatistic, ResistanceStatistic, ResistanceDamageType, ResistanceEffect } from '../type/game-content/item-service-model';
@@ -46,7 +46,7 @@ export class MobService {
                     columnIndex++;
                     const name = row[1];
                     columnIndex++;
-                    const type = row[2];
+                    const type = (JSON.parse(row[2])) as MobType;
                     columnIndex++;
                     const texture = row[3];
                     columnIndex++;

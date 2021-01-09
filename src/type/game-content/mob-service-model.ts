@@ -16,13 +16,18 @@ export class MobParseException extends Error {
 export interface MobPrototype {
     mobId: string,
     name: string,
-    type: string,
+    type: MobType,
     texture: string,
     experience: number,
     statistic: MobStatisticPrototype,
     behaviours: MobBehaviourGroup,
     loot: Loot[],
     eq: string[],
+}
+
+export interface MobType {
+    type: string,
+    infightingTypes?: string[],
 }
 
 export interface MobStatisticPrototype {

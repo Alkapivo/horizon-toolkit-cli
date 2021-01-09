@@ -89,11 +89,17 @@ export interface BombStatistic {
     range: number
 }
 
+export interface FactIntent {
+    name: string,
+    value: boolean,
+}
+
 export interface BookData {
     bookContent?: string,
-    bookImage?: string,
-    setFacts?: string[],
-    isMap?: boolean
+    bookTextureName?: string,
+    setFacts?: FactIntent[],
+    questId?: string,
+    skillId?: string
 }
 
 export interface ToolData {
@@ -119,7 +125,9 @@ export interface ItemFieldsDictionary {
     item_type_weapon: FieldType[],
     item_type_ring: FieldType[],
     item_type_bomb: FieldType[],
-    item_type_talisman: FieldType[]
+    item_type_talisman: FieldType[],
+    item_type_fuel: FieldType[],
+    item_type_telestarion: FieldType[],
 }
 
 export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
@@ -304,7 +312,23 @@ export const requiredItemFieldsDictionary: ItemFieldsDictionary = {
             type: "BombStatistic",
         }
     ],
-    item_type_talisman: []
+    item_type_talisman: [],
+    item_type_fuel: [
+        {
+            name: "fuelValue",
+            type: "number",
+        }
+    ],
+    item_type_telestarion: [
+        {
+            name: "telestarionValue",
+            type: "number",
+        },
+        {
+            name: "telestarionDuration",
+            type: "number",
+        },
+    ],
 }
 
 

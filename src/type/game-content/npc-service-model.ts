@@ -52,18 +52,24 @@ export interface NPCEcho {
 export const npcParametersFieldDictionary = {
     moveRandom: {
         name: "moveRandom",
-        type: "boolean"
+        type: "boolean",
     },
     moveRange: {
         name: "moveRandom",
         type: "number",
-        isRequired: false
+        isRequired: false,
     },
     sellModifiers: {
         name: "sellModifiers",
         type: "SellCategoryModifier[]",
-        isRequired: false
+        isRequired: false,
+    },
+    type: {
+        name: "type",
+        type: "string",
+        isRequired: false,
     }
+
 }
 
 
