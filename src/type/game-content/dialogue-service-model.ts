@@ -16,6 +16,7 @@ export interface DialogueNode {
     text?: string,
     action?: string,
     choices?: DialogueChoice[],
+    branches?: DialogueBranches,
 }
 
 export interface DialogueChoice {
@@ -26,4 +27,9 @@ export interface DialogueChoice {
 
 export interface DialoguePackage {
     dialogues: Dialogue[];
+}
+
+export interface DialogueBranches {
+    truthy: string,
+    falsy: string
 }

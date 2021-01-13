@@ -51,8 +51,12 @@ export class DialogueService {
 
                         return dialogueChoice;
                     })
-                ) :
-                    undefined;
+                ) : undefined;
+                const branches = (node.branches) && (typeof node.branches.True === 'string' || node.branches.True instanceof String) ? 
+                    {
+                        truthy: node.branches.True,
+                        falsy: node.branches.False
+                    } : undefined
 
                 let dialogueNode: DialogueNode = {
                     author: author,
@@ -69,6 +73,10 @@ export class DialogueService {
 
                 if (choices) {
                     dialogueNode.choices = choices;
+                }
+
+                if (branches) {
+                    dialogueNode.branches = branches;
                 }
 
                 dialogue.nodes[nodeName] = dialogueNode;
