@@ -60,6 +60,13 @@ export class MobService {
                     columnIndex++;
                     const eq = (JSON.parse(row[8]) as string[]);
 
+                    if (behaviourGroup.action) {
+
+                        behaviourGroup.action
+                            .filter(group => group.name === "behaviour_useSkill")
+                            .forEach(group => group.parameters['skillId'])
+                    }
+
                     const mob: MobPrototype = {
                         mobId: id,
                         name: name,

@@ -233,11 +233,7 @@ export class Application {
 	
 					const meatPackage = {
 						textureStrips: textureStrips,
-						itemPrototypes: items,
-						mobPrototypes: mobs,
-						npcPrototypes: npcs,
 						chestPrototypes: chests,
-						dialoguePrototypes: dialoguePrototypes,
 						groundDictionaryEntries: groundDictionaryEntries,
 						skillPrototypes: skillPrototypes,
 						questPrototypes:  questPrototypes,
@@ -245,9 +241,46 @@ export class Application {
 					}
 
 					writeFileSync(
-						`${mpkgPath}/meat_package.json`,
+						`${mpkgPath}/mpkg/meat_package.json`,
 						JSON.stringify(meatPackage, null, "\t")
 					);
+
+					const itemPackage = {
+						itemPrototypes: items,
+					}
+
+					writeFileSync(
+						`${mpkgPath}/mpkg/mob.json`,
+						JSON.stringify(itemPackage, null, "\t")
+					);
+					
+					const mobPackage = {
+						mobPrototypes: mobs
+					}
+
+					writeFileSync(
+						`${mpkgPath}/mpkg/mob.json`,
+						JSON.stringify(mobPackage, null, "\t")
+					);
+
+					const npcPackage = {
+						npcPrototypes: npcs
+					}
+
+					writeFileSync(
+						`${mpkgPath}/mpkg/npc.json`,
+						JSON.stringify(npcPackage, null, "\t")
+					);
+
+					const dialoguesPackage = {
+						dialoguePrototypes: dialoguePrototypes
+					}
+
+					writeFileSync(
+						`${mpkgPath}/mpkg/dialogue.json`,
+						JSON.stringify(dialoguesPackage, null, "\t")
+					);
+
 				} catch (exception) {
 					console.error(exception);
 				}
