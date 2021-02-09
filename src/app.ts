@@ -245,15 +245,17 @@ export class Application {
 						JSON.stringify(meatPackage, null, "\t")
 					);
 
+
 					const itemPackage = {
 						itemPrototypes: items,
 					}
 
 					writeFileSync(
-						`${mpkgPath}/mpkg/mob.json`,
+						`${mpkgPath}/mpkg/item.json`,
 						JSON.stringify(itemPackage, null, "\t")
 					);
 					
+
 					const mobPackage = {
 						mobPrototypes: mobs
 					}
@@ -262,6 +264,7 @@ export class Application {
 						`${mpkgPath}/mpkg/mob.json`,
 						JSON.stringify(mobPackage, null, "\t")
 					);
+
 
 					const npcPackage = {
 						npcPrototypes: npcs
@@ -272,6 +275,7 @@ export class Application {
 						JSON.stringify(npcPackage, null, "\t")
 					);
 
+					
 					const dialoguesPackage = {
 						dialoguePrototypes: dialoguePrototypes
 					}
