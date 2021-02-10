@@ -24,6 +24,7 @@ export interface YYPPackage {
         skillPrototypesPath: string,
         questPrototypesPath: string,
         labelDictionaryPath: string, 
+        difficultyDictionaryPath: string,
     }
 }
 

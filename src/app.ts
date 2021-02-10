@@ -226,7 +226,10 @@ export class Application {
 							}
 						});
 					
-					
+					const difficultyDictionaryPath = path.posix
+						.normalize(yypPackage.meatSettings.difficultyDictionaryPath)
+					const difficultyDictionary: any[] = JSON.parse(readFileSync(difficultyDictionaryPath).toString());
+					difficultyDictionary.forEach(difficulty => this.logger.info(`Difficulty ${difficulty.name} parsed.`));
 					
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
@@ -237,7 +240,8 @@ export class Application {
 						groundDictionaryEntries: groundDictionaryEntries,
 						skillPrototypes: skillPrototypes,
 						questPrototypes:  questPrototypes,
-						labelPackages: labelsPackages
+						labelPackages: labelsPackages,
+						difficultyEntries: difficultyDictionary
 					}
 
 					writeFileSync(
