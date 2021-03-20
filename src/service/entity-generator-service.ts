@@ -119,23 +119,25 @@ export class EntityGeneratorService {
 			const initializeEntiteisPathGML = `${yypPath}/scripts/${initializeEntitiesScript}/${initializeEntitiesScript}.gml`;
 			const entitiesDefinition = readFileSync(initializeEntiteisPathGML).toString();
 			const entityPrototypeRegex = /(?<=global.entityPrototypes\[\?)(.*?)(?=;)/g;
-			let parsedEntities: InitializeEntitiesScript[] = [
-				...entitiesDefinition
-					.match(entityPrototypeRegex)
-					.map(match => {
-						const tuple = match.split("]");
-						if (tuple.length >= 2) {
-							const className = tuple[0].trim();
-							const prototype: number = Number(tuple[1].replace("=", "").trim());
-							return {
-								className: className,
-								prototype: prototype,
+			let parsedEntities: InitializeEntitiesScript[] = entitiesDefinition.match(entityPrototypeRegex) ? 
+				[
+					...entitiesDefinition
+						.match(entityPrototypeRegex)
+						.map(match => {
+							const tuple = match.split("]");
+							if (tuple.length >= 2) {
+								const className = tuple[0].trim();
+								const prototype: number = Number(tuple[1].replace("=", "").trim());
+								return {
+									className: className,
+									prototype: prototype,
+								}
 							}
-						}
-						return undefined;
-					})
-					.filter(entity => entity),
-			];
+							return undefined;
+						})
+						.filter(entity => entity),
+				] :
+				[];
 
 			parsedEntities = [
 				...parsedEntities,
