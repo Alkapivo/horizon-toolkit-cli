@@ -25,6 +25,7 @@ export interface YYPPackage {
         questPrototypesPath: string,
         labelDictionaryPath: string, 
         difficultyDictionaryPath: string,
+        worldRegionDictionaryPath: string
     }
 }
 

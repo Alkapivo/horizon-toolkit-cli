@@ -230,6 +230,11 @@ export class Application {
 						.normalize(yypPackage.meatSettings.difficultyDictionaryPath)
 					const difficultyDictionary: any[] = JSON.parse(readFileSync(difficultyDictionaryPath).toString());
 					difficultyDictionary.forEach(difficulty => this.logger.info(`Difficulty ${difficulty.name} parsed.`));
+
+					const worldRegionDictionaryPath = path.posix
+						.normalize(yypPackage.meatSettings.worldRegionDictionaryPath)
+					const worldRegionDictionary: any[] = JSON.parse(readFileSync(worldRegionDictionaryPath).toString());
+					worldRegionDictionary.forEach(worldRegion => this.logger.info(`WorldRegion ${worldRegion.worldName} parsed.`));
 					
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
@@ -241,7 +246,8 @@ export class Application {
 						skillPrototypes: skillPrototypes,
 						questPrototypes:  questPrototypes,
 						labelPackages: labelsPackages,
-						difficultyEntries: difficultyDictionary
+						difficultyEntries: difficultyDictionary,
+						worldRegionDictionary: worldRegionDictionary
 					}
 
 					writeFileSync(
