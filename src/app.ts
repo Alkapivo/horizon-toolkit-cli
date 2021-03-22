@@ -235,6 +235,11 @@ export class Application {
 						.normalize(yypPackage.meatSettings.worldRegionDictionaryPath)
 					const worldRegionDictionary: any[] = JSON.parse(readFileSync(worldRegionDictionaryPath).toString());
 					worldRegionDictionary.forEach(worldRegion => this.logger.info(`WorldRegion ${worldRegion.worldName} parsed.`));
+
+					const mobSfxPackPath = path.posix
+						.normalize(yypPackage.meatSettings.mobSfxPackPath)
+					const mobSfxDictionary: any[] = JSON.parse(readFileSync(mobSfxPackPath).toString());
+					mobSfxDictionary.forEach(mobSfx => this.logger.info(`worldMobSfxPack ${mobSfx.name} (${mobSfx.actions.map(action => "@" + action.type).join()}) parsed.`));
 					
 					const mpkgPath: string = path.posix
 						.normalize(yypPackage.meatSettings.mpkgPath);
@@ -247,7 +252,8 @@ export class Application {
 						questPrototypes:  questPrototypes,
 						labelPackages: labelsPackages,
 						difficultyEntries: difficultyDictionary,
-						worldRegionDictionary: worldRegionDictionary
+						worldRegionDictionary: worldRegionDictionary,
+						mobSfxDictionary: mobSfxDictionary
 					}
 
 					writeFileSync(
