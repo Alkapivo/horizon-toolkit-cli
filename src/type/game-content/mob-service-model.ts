@@ -18,6 +18,7 @@ export interface MobPrototype {
     name: string,
     type: MobType,
     texture: string,
+    mobSfx?: string,
     experience: number,
     statistic: MobStatisticPrototype,
     behaviours: MobBehaviourGroup,
