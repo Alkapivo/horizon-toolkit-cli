@@ -42,6 +42,7 @@ export class MobService {
 
                 let columnIndex = 0;
                 try {
+
                     const id = row[0];
                     columnIndex++;
                     const name = row[1];
@@ -50,15 +51,17 @@ export class MobService {
                     columnIndex++;
                     const texture = row[3];
                     columnIndex++;
-                    const exp = Number(row[4].replace(",", "."));
+                    const mobSfx = row[4];
                     columnIndex++;
-                    const statistic = (JSON.parse(row[5]) as MobStatisticPrototype);
+                    const exp = Number(row[5].replace(",", "."));
                     columnIndex++;
-                    const behaviourGroup = (JSON.parse(row[6]) as MobBehaviourGroup);
+                    const statistic = (JSON.parse(row[6]) as MobStatisticPrototype);
                     columnIndex++;
-                    const loot = (JSON.parse(row[7]) as Loot[]);
+                    const behaviourGroup = (JSON.parse(row[7]) as MobBehaviourGroup);
                     columnIndex++;
-                    const eq = (JSON.parse(row[8]) as string[]);
+                    const loot = (JSON.parse(row[8]) as Loot[]);
+                    columnIndex++;
+                    const eq = (JSON.parse(row[9]) as string[]);
 
                     if (behaviourGroup.action) {
 
@@ -72,6 +75,7 @@ export class MobService {
                         name: name,
                         type: type,
                         texture: texture,
+                        mobSfx: mobSfx,
                         experience: exp,
                         statistic: statistic,
                         behaviours: behaviourGroup,
