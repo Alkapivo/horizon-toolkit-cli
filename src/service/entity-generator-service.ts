@@ -151,10 +151,12 @@ export class EntityGeneratorService {
 					}),
 			];
 			
+			
 
 			const beginId = 200200;
 			const newEntityDefinition = `///@function initialize${this.initialToUpper(projectName)}Entities()\r\n` +
 				`\r\n` +
+				`function initialize${this.initialToUpper(projectName)}Entities() {\n\n` + 
 				parsedEntities.map((entity, index) => {
 					const modelEntry = model.filter(entry => entry.name === entity.className);
 					if (modelEntry.length > 0) {
@@ -167,10 +169,21 @@ export class EntityGeneratorService {
 					}
 					return ``;
 
-				}).join("\n")
+				}).join("\n") + 
+				`}\n`;
 
 			writeFileSync(initializeEntiteisPathGML, newEntityDefinition);
 			console.log(`Save initialize${this.initialToUpper(projectName)}Entities`)
+	}
+
+	private gml23Function(name: string, params?: string[]) {
+
+		return `function ${name}(${params ? params.join(", ") : ""}) {`
+	}
+
+	private gml23EndFunction() {
+
+		return `}\n`
 	}
 
 	public generateEntityCode(state: Entity): CodeSnippet[] {
@@ -195,13 +208,7 @@ export class EntityGeneratorService {
 
 		const functionDescription = this.generateFunctionDescription(functionName, description, parameters, entityClassName, entityObjectName);
 
-		let functionBody = `${Object
-			.entries(parameters)
-			.map((field, index) => {
-				return `\tvar ${field[0]} = argument${index};`
-			})
-			.join(`\n`)}\n\t\n`;
-		functionBody += 
+		let functionBody = 
 			`\tvar ${entityObjectName} = createEntity(${entityClassName});\n\n` +
 			`${Object
 				.entries(parameters)
@@ -217,7 +224,7 @@ export class EntityGeneratorService {
 				.join('\n')}\n\n`;
 		const returnStatement = `\treturn ${entityObjectName};\n\t\n`;
 
-		return functionDescription + functionBody + returnStatement;
+		return functionDescription + functionBody + returnStatement + this.gml23EndFunction();
 	}
 
 	public generateSerializeEntityCode(entity: Entity): string {
@@ -230,9 +237,7 @@ export class EntityGeneratorService {
 		
 		const functionDescription = this.generateFunctionDescription(functionName, description, { [entityObjectName.toString()]:  entityClassName.toString() }, "String", `${entityObjectName}JsonString`);
 
-		let functionBody = 
-			`\tvar ${entityObjectName} = argument0;\n\t\n` +
-			`\tvar jsonObject = createJsonObject();\n\n`;
+		let functionBody = `\tvar jsonObject = createJsonObject();\n\n`;
 		for (const key of Object.keys(parameters)) {
 			const parameterName = this.initialToLower(key);
 			const parameterType = parameters[key];
@@ -561,7 +566,7 @@ export class EntityGeneratorService {
 		functionBody += `\tdestroyJsonObject(jsonObject);\n`;
 		const returnStatement = `\n\treturn ${entityObjectName}JsonString;\n\t\n`;
 
-		return functionDescription + functionBody + returnStatement;
+		return functionDescription + functionBody + returnStatement + this.gml23EndFunction();
 	}
 
 	public generateDeserializeEntityCode(entity: Entity): string {
@@ -574,9 +579,7 @@ export class EntityGeneratorService {
 
 		const functionDescription = this.generateFunctionDescription(functionName, description, { "jsonString":  "String" }, `${entityClassName}`, `${entityObjectName}`);
 
-		let functionBody = 
-			`\tvar jsonString = argument0;\n\t\n` + 
-			`\tvar jsonObject = decodeJson(jsonString);\n\n`;
+		let functionBody = `\tvar jsonObject = decodeJson(jsonString);\n\n`;
 		for (const key of Object.keys(parameters)) {
 			const parameterName = this.initialToLower(key);
 			const parameterType = parameters[key];
@@ -713,7 +716,7 @@ export class EntityGeneratorService {
 		functionBody += `\n\tdestroyJsonObject(jsonObject);\n\t`;
 		const returnStatement = `\n\treturn create${entityClassName}(${this.generateFieldsAsCommaSeparatedString(parameters)});\n\t\n`;
 
-		return functionDescription + functionBody + returnStatement;
+		return functionDescription + functionBody + returnStatement + this.gml23EndFunction();
 	}
 
 	public generateDestroyEntityCode(entity: Entity): string {
@@ -728,7 +731,7 @@ export class EntityGeneratorService {
 
 		const primitives = JSON.parse(entity.primitives);
 		const enums = JSON.parse(entity.enums);
-		let functionBody = `\tvar ${entityObjectName} = argument0;`
+		let functionBody = ``
 		let hasFields = false;
 		const entries = 
 			`${Object.entries(parameters).map((field: any) => {
@@ -1011,7 +1014,7 @@ export class EntityGeneratorService {
 			}
 		}
 
-		return functionDescription + functionBody + `\n\t\n`;
+		return functionDescription + functionBody + `\n\t\n` + this.gml23EndFunction();
 	}
 
 	public generateGettersEntityCodes(entity: Entity): string[] {
@@ -1025,14 +1028,12 @@ export class EntityGeneratorService {
 			const parameters = { [entityObjectName.toString()]:  entityClassName.toString() };
 
 			const functionDescription = _this.generateFunctionDescription(functionName, description, parameters, parameterType, parameterName);
-			const functionBody = `\treturn argument0[@ ${parameterIndex}];\n\t\n`;
+			const functionBody = `\treturn ${Object.keys(parameters)[0]}[@ ${parameterIndex}];\n\t\n`;
 
-			return functionDescription + functionBody;
+			return functionDescription + functionBody + _this.gml23EndFunction();
 		}
 
-		const parameters = this.convertSchemaToParameters(entity.schema);
-        return Object
-            .entries(parameters)
+		return Object.entries(this.convertSchemaToParameters(entity.schema))
             .map((fields, index) => generateGetterEntityCode(entity, fields[0], fields[1], index));
 	}
 
@@ -1050,15 +1051,14 @@ export class EntityGeneratorService {
 			};
 
 			const functionDescription = _this.generateFunctionDescription(functionName, description, parameters, "void");
-			const functionBody = `\targument0[@ ${parameterIndex}] = argument1;\n\t\n`;
 
-			return functionDescription + functionBody;
+			const functionBody = `\t${Object.keys(parameters)[0]}[@ ${parameterIndex}] = ${Object.keys(parameters)[1]};\n\t\n`;
+
+			return functionDescription + functionBody + _this.gml23EndFunction();
 		}
 
-		const parameters = this.convertSchemaToParameters(entity.schema);
-        return Object
-            .entries(parameters)
-            .map((fields, index) => generateSetterEntityCode(entity, fields[0], fields[1], index));
+		return Object.entries(this.convertSchemaToParameters(entity.schema))
+			.map((fields, index) => generateSetterEntityCode(entity, fields[0], fields[1], index));
 	}
 
 	public generateEntityLabelJSON(entity: Entity): string {
@@ -1133,7 +1133,8 @@ export class EntityGeneratorService {
 				`${this.generateParametersDescription(parameters)}\n` +
 				`${returnTemplate}` +
 				`///@throws {Exception}\n` +
-				`///@generated {${timestamp}}\n\n`;
+				`///@generated {${timestamp}}\n\n` + 
+				`${this.gml23Function(functionName, Object.keys(parameters))}\n\n`;
 
 			return template;
 	}
