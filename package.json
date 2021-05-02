@@ -24,7 +24,7 @@
 		"gamemaker",
 		"gms2"
 	],
-	"author": "devhorizon",
+	"author": "devHorizon Aleksander Nowak",
 	"license": "MIT",
 	"devDependencies": {
 		"@types/chai": "^4.2.11",
