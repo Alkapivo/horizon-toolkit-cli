@@ -1,4 +1,5 @@
 import { FieldType } from "./game-content-model";
+import { FactIntent } from "./item-service-model";
 
 export class NPCTypeNotFoundException extends Error {
     constructor(message: string) {
@@ -20,6 +21,7 @@ export interface NPC {
     tradeInventory: TradeEntry[],
     parameters: NPCParameters,
     echoes: NPCEcho[],
+    icons: NpcIcon[]
 }
 
 export interface TradeEntry {
@@ -47,6 +49,11 @@ export interface NPCParametersFieldDictionary {
 export interface NPCEcho {
     echo: string,
     duration: number
+}
+
+export interface NpcIcon {
+    type: string,
+    requiredFacts?: FactIntent[]
 }
 
 export const npcParametersFieldDictionary = {

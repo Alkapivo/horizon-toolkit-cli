@@ -4,7 +4,7 @@ import { GoogleSheetApiService } from "./google-drive-api-service";
 import { ExcelService } from "./excel-service";
 import { FieldType } from '../type/game-content/game-content-model';
 import { assert } from 'console';
-import { NPC, NPCParseException, TradeEntry, NPCParameters, NPCEcho, npcParametersFieldDictionary, NPCTypeNotFoundException, SellCategoryModifier } from '../type/game-content/npc-service-model';
+import { NPC, NPCParseException, TradeEntry, NPCParameters, NPCEcho, npcParametersFieldDictionary, NPCTypeNotFoundException, SellCategoryModifier, NpcIcon } from '../type/game-content/npc-service-model';
 
 @injectable()
 export class NPCService {
@@ -54,6 +54,8 @@ export class NPCService {
                     const npcParameters = (JSON.parse(row[5]) as NPCParameters);
                     columnIndex++;
                     const echoes = (JSON.parse(row[6]) as NPCEcho[]);
+                    columnIndex++;
+                    const icons = (JSON.parse(row[7]) as NpcIcon[]);
                     
                     const npc: NPC = {
                         npcId: id,
@@ -63,6 +65,7 @@ export class NPCService {
                         tradeInventory: tradeInventory,
                         parameters: npcParameters,
                         echoes: echoes,
+                        icons: icons
                     }
 
                     this.logger.info(`NPC "${npc.name}" parsed.`);
