@@ -1153,7 +1153,7 @@ export class EntityGeneratorService {
 		if ((parameterType.includes("<")) &&
 			(parameterType.includes(">"))) {
 
-			if (parameterType.includes("Map")) {
+			if (parameterType.includes("Map<")) {
 				const mapValueType = parameterType.replace("Map<", "").replace(">", "").split("::")[1].replace(" ", "");
 				return isParameterPrimitiveOrEnum(mapValueType) ? 
 					FieldTypes.PRIMITIVE_MAP :

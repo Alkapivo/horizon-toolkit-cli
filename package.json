@@ -1,6 +1,6 @@
 {
 	"name": "horizon-toolkit-cli",
-	"version": "0.9.61",
+	"version": "0.9.62",
 	"description": "horizon-engine cli",
 	"main": "lib/app.js",
 	"bin": {
