@@ -258,9 +258,8 @@ export class Application {
 
 					writeFileSync(
 						`${mpkgPath}/mpkg/meat_package.json`,
-						JSON.stringify(meatPackage, null, "\t")
+						JSON.stringify(meatPackage).split("\n").join(" ").split("  "). join("")
 					);
-
 
 					const itemPackage = {
 						itemPrototypes: items,
@@ -268,7 +267,7 @@ export class Application {
 
 					writeFileSync(
 						`${mpkgPath}/mpkg/item.json`,
-						JSON.stringify(itemPackage, null, "\t")
+						JSON.stringify(itemPackage).split("\n").join(" ").split("  "). join("")
 					);
 					
 
@@ -278,7 +277,7 @@ export class Application {
 
 					writeFileSync(
 						`${mpkgPath}/mpkg/mob.json`,
-						JSON.stringify(mobPackage, null, "\t")
+						JSON.stringify(mobPackage).split("\n").join(" ").split("  "). join("")
 					);
 
 
@@ -288,7 +287,7 @@ export class Application {
 
 					writeFileSync(
 						`${mpkgPath}/mpkg/npc.json`,
-						JSON.stringify(npcPackage, null, "\t")
+						JSON.stringify(npcPackage).split("\n").join(" ").split("  "). join("")
 					);
 
 					
@@ -298,7 +297,7 @@ export class Application {
 
 					writeFileSync(
 						`${mpkgPath}/mpkg/dialogue.json`,
-						JSON.stringify(dialoguesPackage, null, "\t")
+						JSON.stringify(dialoguesPackage).split("\n").join(" ").split("  "). join("")
 					);
 
 				} catch (exception) {
